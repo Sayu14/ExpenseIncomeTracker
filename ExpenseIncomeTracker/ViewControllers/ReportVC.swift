@@ -6,17 +6,47 @@
 //
 
 import UIKit
+import FirebaseAuth
+import FirebaseFirestore
+import Firebase
+import LoadingView
+
+var TOTAL_INCOME = 0.0
+
+var TOTAL_EXPENSE = 0.0
 
 class ReportVC: UIViewController {
     
-    // MARK: - Arrays
-    
-    let reportArray = ["Expense", "Income"]
-
     // MARK: - Initialization
     
-    // Expense/Income History
+    // Table view for Transaction details
+    
+    lazy var reportTable: UITableView = {
         
+        let table = UITableView()
+        
+        table.translatesAutoresizingMaskIntoConstraints = false
+        
+        table.backgroundColor = .clear
+        
+        table.separatorStyle = .none
+        
+        table.showsVerticalScrollIndicator = false
+        
+        table.isScrollEnabled = true
+        
+        table.register(CellTransactionItem.self, forCellReuseIdentifier: "cellTransaction")
+        
+        table.delegate = self
+        
+        table.dataSource = self
+        
+        return table
+        
+    }()
+    
+    // Expense/Income History
+    
     lazy var historyLabel: UILabel = {
         
         let label = UILabel()
@@ -36,7 +66,7 @@ class ReportVC: UIViewController {
     }()
     
     // Add label
-        
+    
     lazy var addLabel: UILabel = {
         
         let label = UILabel()
@@ -54,7 +84,7 @@ class ReportVC: UIViewController {
         return label
         
     }()
-
+    
     // Add button
     
     lazy var addBtn: UIButton = {
@@ -70,7 +100,7 @@ class ReportVC: UIViewController {
         btn.layer.cornerRadius = 28
         
         btn.layer.borderWidth = 1
-
+        
         btn.layer.borderColor = MyColors.darkGreen.getColor().cgColor
         
         return btn
@@ -85,7 +115,9 @@ class ReportVC: UIViewController {
         
         label.translatesAutoresizingMaskIntoConstraints = false
         
-        label.text = "$ 4,034.00"
+//        label.text = "Rs \(TOTAL_AMOUNT.string)"
+        
+        label.text = "Rs . "
         
         label.textColor = .black
         
@@ -96,7 +128,7 @@ class ReportVC: UIViewController {
     }()
     
     // Total label
-        
+    
     lazy var totalLabel: UILabel = {
         
         let label = UILabel()
@@ -162,7 +194,7 @@ class ReportVC: UIViewController {
         let btn = UIButton()
         
         btn.translatesAutoresizingMaskIntoConstraints = false
-                
+        
         btn.setImage(UIImage(named: "notification"), for: .normal)
         
         btn.tintColor = .white
@@ -225,6 +257,16 @@ class ReportVC: UIViewController {
     
     // MARK: - Constants and Variables
     
+    // Temporary model data
+    
+    var modelTransaction: [Transaction]?
+    
+    let reportArray = ["Expense", "Income"]
+    
+    var income = [Transaction]()
+    
+    var expense = [Transaction]()
+        
     // MARK: - View Did Load
     
     override func viewDidLoad() {
@@ -232,6 +274,8 @@ class ReportVC: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
+        
+        getExpenseData()
         
         setupLayout()
         
@@ -252,6 +296,113 @@ class ReportVC: UIViewController {
     }
     
     // MARK: - Additional Functions
+    
+    func getExpenseData() {
+        
+        reportTable.startSpinning(color: .gray)
+        
+        let db = Firestore.firestore()
+        
+        let uid = Auth.auth().currentUser?.uid
+        
+        let docRef = db.collection("users").document(uid!).collection("transaction")
+        
+        docRef.getDocuments() { [self] (querySnapshot, err) in
+            
+            self.reportTable.stopSpinning()
+            
+            if let err = err {
+                
+                print("Error getting documents: \(err)")
+                
+            } else {
+                
+                var expenseList = [Transaction]()
+                
+                var sum = [String]()
+                
+                for document in querySnapshot!.documents {
+                    
+                    print("\(document.documentID) => \(document.data())")
+                    
+                    do {
+                        
+                        let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: .prettyPrinted)
+                        
+                        print("JSON Data = \(jsonData.description)")
+                        
+                        let decoder = JSONDecoder()
+                        
+                        do {
+                            
+                            let decoded = try decoder.decode(Transaction.self, from: jsonData)
+                            
+                            expenseList.append(decoded)
+                            
+                            sum.append(decoded.amount)
+                            
+                        } catch {
+                            
+                            print("Failed to decode JSON")
+                            
+                        }
+                        
+                    } catch {
+                        
+                        print(error.localizedDescription)
+                        
+                    }
+                    
+                }
+                
+                self.modelTransaction = expenseList
+                
+                var incomeAmt = 0.0
+                
+                var expenseAmt = 0.0
+                
+                for i in expenseList {
+                                            
+                    switch i.type {
+                        
+                    case TransactionType.income.rawValue:
+                        self.income.append(i)
+                        incomeAmt += Double(i.amount) ?? 0.0
+
+                    case TransactionType.expense.rawValue:
+                        self.expense.append(i)
+                        expenseAmt += Double(i.amount) ?? 0.0
+
+                    default:
+                        break
+                        
+                    }
+                                            
+                }
+                
+                TOTAL_INCOME = incomeAmt
+                
+                TOTAL_EXPENSE = expenseAmt
+                
+                switch self.segmentedControl.selectedSegmentIndex {
+                    
+                case 0:
+                    self.totalNumber.text = "Rs. \(expenseAmt)"
+                case 1:
+                    self.totalNumber.text = "Rs. \(incomeAmt)"
+                default:
+                    self.totalNumber.text = "Rs. \(expenseAmt)"
+                    
+                }
+                                
+                self.reportTable.reloadData()
+                
+            }
+            
+        }
+        
+    }
+    
     
 }
 
@@ -332,7 +483,7 @@ extension ReportVC {
         topView.addSubview(notificationBtn)
         
         NSLayoutConstraint.activate([
-        
+            
             notificationBtn.centerYAnchor.constraint(equalTo: addTitle.centerYAnchor),
             
             notificationBtn.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -24),
@@ -350,7 +501,7 @@ extension ReportVC {
         topView.addSubview(segmentedControl)
         
         NSLayoutConstraint.activate([
-        
+            
             segmentedControl.topAnchor.constraint(equalTo: addTitle.bottomAnchor, constant: 28),
             
             segmentedControl.leadingAnchor.constraint(equalTo: topView.leadingAnchor, constant: 40),
@@ -358,7 +509,7 @@ extension ReportVC {
             segmentedControl.trailingAnchor.constraint(equalTo: topView.trailingAnchor, constant: -40),
             
             segmentedControl.heightAnchor.constraint(equalToConstant: 48)
-        
+            
         ])
         
     }
@@ -377,6 +528,8 @@ extension ReportVC {
         
         autoLayoutForHistoryLabel()
         
+        autoLayoutForReportTable()
+        
     }
     
     func autoLayoutForMainView() {
@@ -384,7 +537,7 @@ extension ReportVC {
         view.addSubview(mainView)
         
         NSLayoutConstraint.activate([
-        
+            
             mainView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             
             mainView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -392,7 +545,7 @@ extension ReportVC {
             mainView.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 32),
             
             mainView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        
+            
         ])
         
     }
@@ -402,11 +555,11 @@ extension ReportVC {
         mainView.addSubview(totalLabel)
         
         NSLayoutConstraint.activate([
-        
+            
             totalLabel.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
             
             totalLabel.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 16)
-        
+            
         ])
         
     }
@@ -416,11 +569,11 @@ extension ReportVC {
         mainView.addSubview(totalNumber)
         
         NSLayoutConstraint.activate([
-        
+            
             totalNumber.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
             
             totalNumber.topAnchor.constraint(equalTo: totalLabel.bottomAnchor, constant: 16)
-        
+            
         ])
         
     }
@@ -430,7 +583,7 @@ extension ReportVC {
         mainView.addSubview(addBtn)
         
         NSLayoutConstraint.activate([
-        
+            
             addBtn.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
             
             addBtn.topAnchor.constraint(equalTo: totalNumber.bottomAnchor, constant: 16),
@@ -448,7 +601,7 @@ extension ReportVC {
         mainView.addSubview(addLabel)
         
         NSLayoutConstraint.activate([
-        
+            
             addLabel.centerXAnchor.constraint(equalTo: mainView.centerXAnchor),
             
             addLabel.topAnchor.constraint(equalTo: addBtn.bottomAnchor, constant: 4)
@@ -462,11 +615,29 @@ extension ReportVC {
         mainView.addSubview(historyLabel)
         
         NSLayoutConstraint.activate([
-        
+            
             historyLabel.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 24),
             
             historyLabel.topAnchor.constraint(equalTo: addLabel.bottomAnchor, constant: 24)
+            
+        ])
         
+    }
+    
+    func autoLayoutForReportTable() {
+        
+        mainView.addSubview(reportTable)
+        
+        NSLayoutConstraint.activate([
+            
+            reportTable.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 20),
+            
+            reportTable.trailingAnchor.constraint(equalTo: mainView.trailingAnchor, constant: -20),
+            
+            reportTable.topAnchor.constraint(equalTo: historyLabel.bottomAnchor, constant: 18),
+                        
+            reportTable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -120)
+            
         ])
         
     }
@@ -497,25 +668,38 @@ extension ReportVC {
             addTitle.text = "Expense Report"
             historyLabel.text = "Expense History"
             totalLabel.text = "Total Expense"
+            let formatter = NumberFormatter()
+            formatter.locale = Locale(identifier: "ne_NP")
+            formatter.numberStyle = .currency
+            if let formattedTipAmount = formatter.string(from: TOTAL_EXPENSE as NSNumber) {
+                totalNumber.text = "\(formattedTipAmount)"
+            }
+//            totalNumber.text = "Rs \(TOTAL_EXPENSE)"
+            reportTable.reloadData()
             
         case 1:
             addTitle.text = "Income Report"
             historyLabel.text = "Income History"
             totalLabel.text = "Total Income"
+            let formatter = NumberFormatter()
+            formatter.locale = Locale(identifier: "ne_NP")
+            formatter.numberStyle = .currency
+            if let formattedTipAmount = formatter.string(from: TOTAL_INCOME as NSNumber) {
+                totalNumber.text = "\(formattedTipAmount)"
+            }
+//            totalNumber.text = "Rs \(TOTAL_INCOME)"
+            reportTable.reloadData()
             
         default:
-            addTitle.text = "Expense Report"
-            historyLabel.text = "Expense History"
-            totalLabel.text = "Total Expense"
-            
+            break
         }
+        
+       
         
     }
     
     @objc func addBtnPressed() {
-        
-//        let vc = AddIncomeExpenseVC()
-        
+                
         let vc = TransactionDetailsVC()
         
         navigationController?.pushViewController(vc, animated: true)
@@ -532,3 +716,102 @@ extension ReportVC {
     }
     
 }
+
+extension ReportVC: UITableViewDelegate, UITableViewDataSource {
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        
+        if segmentedControl.selectedSegmentIndex == 0 {
+         
+            return expense.count
+        
+        } else if segmentedControl.selectedSegmentIndex == 1 {
+            
+            return income.count
+            
+        }
+        
+        return 0
+        
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        return 1
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cellTransaction", for: indexPath) as! CellTransactionItem
+        
+        switch segmentedControl.selectedSegmentIndex {
+            
+        case 0:
+            
+            cell.nameItem.text = expense[indexPath.section].name
+            
+            cell.dateItem.text = expense[indexPath.section].date
+            
+            cell.nameItem.textColor = MyColors.red.getColor()
+            
+            cell.amountTransaction.textColor = MyColors.red.getColor()
+            
+            cell.amountTransaction.text = "- Rs. \(expense[indexPath.section].amount )"
+        
+        case 1:
+            
+            cell.nameItem.text = income[indexPath.section].name
+            
+            cell.dateItem.text = income[indexPath.section].date
+            
+            cell.nameItem.textColor = MyColors.green.getColor()
+            
+            cell.amountTransaction.textColor = MyColors.green.getColor()
+            
+            cell.amountTransaction.text = "+ Rs. \(income[indexPath.section].amount )"
+            
+        default:
+            
+            cell.nameItem.text = expense[indexPath.section].name
+            
+            cell.dateItem.text = expense[indexPath.section].date
+            
+            cell.nameItem.textColor = MyColors.red.getColor()
+            
+            cell.amountTransaction.textColor = MyColors.red.getColor()
+            
+            cell.amountTransaction.text = "- Rs. \(expense[indexPath.section].amount )"
+            
+        }
+        
+        return cell
+        
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        return 50
+        
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        
+        return 0
+        
+    }
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let headerView = UIView()
+        headerView.backgroundColor = UIColor.clear
+        return headerView
+    }
+    
+}
+
+extension LosslessStringConvertible {
+    
+    var string: String { .init(self) }
+    
+}
+

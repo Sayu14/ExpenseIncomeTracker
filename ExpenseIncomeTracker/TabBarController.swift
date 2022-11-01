@@ -42,10 +42,16 @@ class TabBarController: UITabBarController {
     func setUpVC() {
         
         let button = UIButton(type: .custom)
+                
+        var toMakeButtonUp = 68
+
+        if (UIApplication.shared.keyWindow?.safeAreaInsets.bottom ?? 0) > 0 {
+
+            toMakeButtonUp = 140
+
+        }
         
-        let toMakeButtonUp = 120
-        
-        button.frame = CGRect(x: 0.0, y: 0.0, width: 65, height: 65)
+        button.frame = CGRect(x: 0, y: 0, width: 65, height: 65)
         
         button.setImage(UIImage(systemName: "plus", withConfiguration: UIImage.SymbolConfiguration(pointSize: 21, weight: .bold)), for: .normal)
         
@@ -64,19 +70,19 @@ class TabBarController: UITabBarController {
         button.tintColor = .white
         
         let heightDifference: CGFloat = CGFloat(toMakeButtonUp)
-        
+
         if heightDifference < 0 {
-            
+
             button.center = tabBar.center
-            
+
         } else {
-            
+
             var center: CGPoint = tabBar.center
-            
-            center.y = center.y - heightDifference / 2.0
-            
+
+            center.y = center.y - heightDifference / 2.5
+
             button.center = center
-            
+
         }
         
         button.addTarget(self, action: #selector(btnTouched), for:.touchUpInside)
@@ -149,33 +155,52 @@ extension UIImage {
     }
     
     enum ContentMode {
+        
         case contentFill
+        
         case contentAspectFill
+        
         case contentAspectFit
+        
     }
     
     func resize(withSize size: CGSize, contentMode: ContentMode = .contentAspectFill) -> UIImage? {
+        
         let aspectWidth = size.width / self.size.width
+        
         let aspectHeight = size.height / self.size.height
         
         switch contentMode {
+            
         case .contentFill:
             return resize(withSize: size)
+            
         case .contentAspectFit:
             let aspectRatio = min(aspectWidth, aspectHeight)
+            
             return resize(withSize: CGSize(width: self.size.width * aspectRatio, height: self.size.height * aspectRatio))
+            
         case .contentAspectFill:
             let aspectRatio = max(aspectWidth, aspectHeight)
+            
             return resize(withSize: CGSize(width: self.size.width * aspectRatio, height: self.size.height * aspectRatio))
+            
         }
+        
     }
     
     private func resize(withSize size: CGSize) -> UIImage? {
+        
         UIGraphicsBeginImageContextWithOptions(size, false, self.scale)
+        
         defer { UIGraphicsEndImageContext() }
+        
         draw(in: CGRect(x: 0.0, y: 0.0, width: size.width, height: size.height))
+        
         return UIGraphicsGetImageFromCurrentImageContext()
+        
     }
+    
 }
 
 

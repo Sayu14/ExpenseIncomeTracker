@@ -41,6 +41,8 @@
 		7A029AD82907108500A2D785 /* HomeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A029AD02907108500A2D785 /* HomeVC.swift */; };
 		7A029AD92907108500A2D785 /* RegisterVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A029AD12907108500A2D785 /* RegisterVC.swift */; };
 		7A029ADC290710CD00A2D785 /* CellStatisticTimePeriod.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A029ADB290710CD00A2D785 /* CellStatisticTimePeriod.swift */; };
+		7A12C43C290910EE009EB7EA /* CellTransactionItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12C43B290910EE009EB7EA /* CellTransactionItem.swift */; };
+		7A12C43F2909269B009EB7EA /* ModelTransactionDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A12C43E2909269B009EB7EA /* ModelTransactionDetails.swift */; };
 		7A2226DB2907C2FB00191C63 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 7A2226DA2907C2FB00191C63 /* FirebaseAnalytics */; };
 		7A2226DD2907C2FB00191C63 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 7A2226DC2907C2FB00191C63 /* FirebaseAuth */; };
 		7A2226DF2907C2FB00191C63 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 7A2226DE2907C2FB00191C63 /* FirebaseFirestore */; };
@@ -85,7 +87,10 @@
 		7A029AD02907108500A2D785 /* HomeVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeVC.swift; sourceTree = "<group>"; };
 		7A029AD12907108500A2D785 /* RegisterVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RegisterVC.swift; sourceTree = "<group>"; };
 		7A029ADB290710CD00A2D785 /* CellStatisticTimePeriod.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CellStatisticTimePeriod.swift; sourceTree = "<group>"; };
+		7A12C43B290910EE009EB7EA /* CellTransactionItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellTransactionItem.swift; sourceTree = "<group>"; };
+		7A12C43E2909269B009EB7EA /* ModelTransactionDetails.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTransactionDetails.swift; sourceTree = "<group>"; };
 		7AD2962F2907293A005B224C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		7AF6200D2910E09D0030BCD5 /* ExpenseIncomeTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ExpenseIncomeTracker.entitlements; sourceTree = "<group>"; };
 		8191715D8723D736F4E2606F /* Pods-ExpenseIncomeTracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExpenseIncomeTracker.release.xcconfig"; path = "Target Support Files/Pods-ExpenseIncomeTracker/Pods-ExpenseIncomeTracker.release.xcconfig"; sourceTree = "<group>"; };
 		B16E819BEDB14CA37796D60E /* Pods-ExpenseIncomeTracker.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExpenseIncomeTracker.debug.xcconfig"; path = "Target Support Files/Pods-ExpenseIncomeTracker/Pods-ExpenseIncomeTracker.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -136,6 +141,8 @@
 		7A029A8B29070EE700A2D785 /* ExpenseIncomeTracker */ = {
 			isa = PBXGroup;
 			children = (
+				7AF6200D2910E09D0030BCD5 /* ExpenseIncomeTracker.entitlements */,
+				7A12C43D2909268A009EB7EA /* Models */,
 				7A029ADA290710B900A2D785 /* CellCollectionView */,
 				7A029AC92907106500A2D785 /* ViewControllers */,
 				7A029AA42907103700A2D785 /* CustomFonts */,
@@ -195,8 +202,17 @@
 			isa = PBXGroup;
 			children = (
 				7A029ADB290710CD00A2D785 /* CellStatisticTimePeriod.swift */,
+				7A12C43B290910EE009EB7EA /* CellTransactionItem.swift */,
 			);
 			path = CellCollectionView;
+			sourceTree = "<group>";
+		};
+		7A12C43D2909268A009EB7EA /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				7A12C43E2909269B009EB7EA /* ModelTransactionDetails.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 		FE89125DE184393704E1C083 /* Frameworks */ = {
@@ -352,6 +368,7 @@
 				7A029AA129070F8D00A2D785 /* Utilities.swift in Sources */,
 				7A029AD22907108500A2D785 /* ReportVC.swift in Sources */,
 				7A029AD72907108500A2D785 /* AddIncomeExpenseVC.swift in Sources */,
+				7A12C43C290910EE009EB7EA /* CellTransactionItem.swift in Sources */,
 				7A029AD52907108500A2D785 /* LoginVC.swift in Sources */,
 				7A029AD62907108500A2D785 /* ProfileVC.swift in Sources */,
 				7A029AA32907101200A2D785 /* TabBarController.swift in Sources */,
@@ -360,6 +377,7 @@
 				7A029AD42907108500A2D785 /* TransactionDetailsVC.swift in Sources */,
 				7A029AD92907108500A2D785 /* RegisterVC.swift in Sources */,
 				7A029AD82907108500A2D785 /* HomeVC.swift in Sources */,
+				7A12C43F2909269B009EB7EA /* ModelTransactionDetails.swift in Sources */,
 				7A029A8D29070EE700A2D785 /* AppDelegate.swift in Sources */,
 				7A029ADC290710CD00A2D785 /* CellStatisticTimePeriod.swift in Sources */,
 			);
@@ -499,6 +517,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ExpenseIncomeTracker/ExpenseIncomeTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W8CF47983Q;
@@ -527,6 +546,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ExpenseIncomeTracker/ExpenseIncomeTracker.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = W8CF47983Q;

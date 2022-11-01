@@ -28,7 +28,7 @@ class ProfileVC: UIViewController {
         
         btn.backgroundColor = MyColors.green.getColor()
         
-        btn.layer.cornerRadius = 30
+        btn.layer.cornerRadius = 24
         
         btn.layer.shadowColor = MyColors.green.getColor().cgColor
         
@@ -556,7 +556,7 @@ extension ProfileVC {
             
             logoutBtn.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.5),
             
-            logoutBtn.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.065)
+            logoutBtn.heightAnchor.constraint(equalToConstant: 48)
         
         ])
         

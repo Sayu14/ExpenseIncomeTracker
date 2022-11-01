@@ -12,12 +12,21 @@ import FirebaseFirestore
 import Firebase
 import FirebaseFirestoreSwift
 
+enum TransactionType: String {
+    
+    case income = "INCOME"
+    
+    case expense = "EXPENSE"
+    
+}
+
 class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
     
     // MARK: - Arrays
     
     let segmentedArray = ["Expense", "Income"]
     
+    var transactionType = TransactionType.expense
     // MARK: - Initialization
     
     // Save button
@@ -423,30 +432,6 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
-        switchBasedNextTextField(textField)
-        
-        let name = nameField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        if (name != nil) || (amount != nil) || (date != nil) {
-            
-            Toast.showToast(state: .warning, message: "Please fill out all fields")
-            
-        } else {
-            
-            self.saveData(name: name!, amount: amount!, date: date!)
-            
-        }
-        
-        return true
-        
-    }
-    
     private func switchBasedNextTextField(_ textField: UITextField) {
         
         switch textField {
@@ -467,6 +452,36 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
     }
     
+    func isValid() -> Bool {
+        
+        if nameField.text == "" || nameField.text == nil {
+            
+            Toast.showToast(state: .warning, message: "Enter Name First")
+            
+            return false
+            
+        }
+        
+        if amountField.text == "" || amountField.text == nil {
+            
+            Toast.showToast(state: .warning, message: "Enter Amount First")
+            
+            return false
+            
+        }
+        
+        if dateField.text == "" || dateField.text == nil {
+            
+            Toast.showToast(state: .warning, message: "Enter Date First")
+            
+            return false
+            
+        }
+        
+        return true
+        
+    }
+    
     func saveData(name: String, amount: String, date: String) {
         
         let name = nameField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -475,17 +490,71 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
         let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         
-//        let hour = Calendar.current.component(.hour, from: Date())
-//
-//        let minute = Calendar.current.component(.minute, from: Date())
-//
         let db = Firestore.firestore()
+        
+        let randomNumber = String(Date().timeIntervalSince1970 * 1000)
         
         let uid = Auth.auth().currentUser?.uid
         
-        let dbRef = db.collection("users").document(uid!).collection("expense").document(uid!)
+        let dates = Date()
         
-        dbRef.setData(["name": name!, "amount": amount!, "date": date!])
+        let dateFormatter = DateFormatter()
+        
+        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        
+        dateFormatter.dateFormat = "HH:mm"
+        
+        let dateString = dateFormatter.string(from: dates)
+                
+        if segmentedControl.selectedSegmentIndex == 0 {
+        
+        let dbRef = db.collection("users").document(uid!).collection("transaction").document(randomNumber)
+        
+            dbRef.setData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": transactionType.rawValue]) { err in
+            
+            if let err = err {
+                
+                Toast.showToast(state: .failed, message: "Error writing document: \(err)")
+
+            } else {
+                                
+                Toast.showToast(state: .success, message: "Expense added successfully!")
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    
+                    self.navigationController?.popViewController(animated: true)
+
+                }
+                
+            }
+            
+        }
+            
+        } else if segmentedControl.selectedSegmentIndex == 1 {
+            
+            let dbRef = db.collection("users").document(uid!).collection("transaction").document(randomNumber)
+            
+            dbRef.setData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": transactionType.rawValue]) { err in
+                
+                if let err = err {
+                    
+                    Toast.showToast(state: .failed, message: "Error writing document: \(err)")
+
+                } else {
+                                    
+                    Toast.showToast(state: .success, message: "Income added successfully!")
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        
+                        self.navigationController?.popViewController(animated: true)
+
+                    }
+                    
+                }
+                
+            }
+            
+        }
         
     }
     
@@ -797,23 +866,31 @@ extension AddIncomeExpenseVC {
         
         if segmentedControl.selectedSegmentIndex == 0 {
             
-//            let name = nameField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-//
-//            let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-//
-//            let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-//
-//            let db = Firestore.firestore()
-//
-//            let uid = Auth.auth().currentUser?.uid
-//
-//            db.collection("users").document(uid!).collection("expense").document(uid!).setData(["name": name!, "amount": amount, "date": date])
+            let name = nameField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
             
-            navigationController?.popViewController(animated: true)
+            let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
             
+            let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            if isValid() {
+                
+                saveData(name: name ?? "", amount: amount ?? "", date: date ?? "")
+                
+            }
+                        
         } else if segmentedControl.selectedSegmentIndex == 1 {
             
-            navigationController?.popViewController(animated: true)
+            let name = nameField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+            
+            if isValid() {
+                
+                saveData(name: name ?? "", amount: amount ?? "", date: date ?? "")
+                
+            }
             
         }
         
@@ -826,11 +903,17 @@ extension AddIncomeExpenseVC {
         case 0:
             addTitle.text = "Add Expense"
             
+            transactionType = TransactionType.expense
+            
         case 1:
             addTitle.text = "Add Income"
             
+            transactionType = TransactionType.income
+            
         default:
             addTitle.text = "Add Expense"
+            
+            transactionType = TransactionType.expense
             
         }
         
@@ -995,6 +1078,12 @@ extension UIViewController {
         return tap
         
     }
+    
+}
+
+extension Sequence where Element: AdditiveArithmetic {
+    
+    func sum() -> Element { reduce(.zero, +) }
     
 }
 

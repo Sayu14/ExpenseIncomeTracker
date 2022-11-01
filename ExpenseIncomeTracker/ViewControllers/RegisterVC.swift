@@ -307,8 +307,6 @@ class RegisterVC: UIViewController, UITextFieldDelegate {
         
     }()
     
-    
-    
     // MARK: - Constants and Variables
     
     // MARK: - View Did Load

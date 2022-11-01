@@ -18,26 +18,6 @@ class Utilities{
         
     }
     
-    // Minimal toast
-    
-    func showWarning(message: String){
-        
-        Toast.showToast(state: .warning, message: message)
-        
-    }
-    
-    func showFailed(message: String){
-        
-        Toast.showToast(state: .failed, message: message)
-        
-    }
-    
-    func showSuccess(message: String){
-        
-        Toast.showToast(state: .success, message: message)
-        
-    }
-    
 }
 
 enum MyColors{
@@ -62,6 +42,8 @@ enum MyColors{
     
     case segmentBorder
     
+    case imgBg
+    
     func getColor() -> UIColor{
         
         switch self {
@@ -73,7 +55,7 @@ enum MyColors{
             return UIColor(hexString: "228C86")
             
         case .greenText:
-            return UIColor(hexString: "1F8A84")
+            return UIColor(hexString: "25A969")
             
         case .darkGreen:
             return UIColor(hexString: "#008079")
@@ -95,6 +77,9 @@ enum MyColors{
             
         case .segmentBorder:
             return UIColor(hexString: "#E5E5E7")
+            
+        case .imgBg:
+            return UIColor(hexString: "#EEF7F5")
             
         }
         
