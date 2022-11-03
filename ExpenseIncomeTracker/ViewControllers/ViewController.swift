@@ -90,7 +90,7 @@ class ViewController: UIViewController {
         
         label.text = "Spend Smarter \nSave More"
         
-        label.textColor = MyColors.greenText.getColor()
+        label.textColor = MyColors.green.getColor()
         
         label.font = UIFont(name: "Inter-Bold", size: 32)
         

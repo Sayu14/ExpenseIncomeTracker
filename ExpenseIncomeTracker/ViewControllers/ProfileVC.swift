@@ -280,6 +280,8 @@ class ProfileVC: UIViewController {
         
         view.backgroundColor = .white
         
+        getUserData()
+        
         setupLayout()
         
         setupUIAction()
@@ -299,6 +301,34 @@ class ProfileVC: UIViewController {
     }
     
     // MARK: - Additional Functions
+    
+    func getUserData() {
+        
+        let db = Firestore.firestore()
+        
+        let uid = Auth.auth().currentUser?.uid
+        
+        let email = Auth.auth().currentUser?.email
+        
+        profileEmailLabel.text = email
+        
+        db.collection("users").document(uid!).getDocument { snapshot, error in
+
+            if error != nil {
+
+                print("Cant fetch current user data")
+
+            } else {
+
+                let userName = snapshot?.get("fullname") as? String ?? ""
+                
+                self.profileNameLabel.text = userName
+                
+            }
+
+        }
+        
+    }
     
 }
 

@@ -115,9 +115,7 @@ class ReportVC: UIViewController {
         
         label.translatesAutoresizingMaskIntoConstraints = false
         
-//        label.text = "Rs \(TOTAL_AMOUNT.string)"
-        
-        label.text = "Rs . "
+        label.text = "Rs \(TOTAL_EXPENSE.string)"
         
         label.textColor = .black
         
@@ -287,7 +285,7 @@ class ReportVC: UIViewController {
     
     // MARK: - View Will Appear
     override func viewWillAppear(_ animated: Bool) {
-        
+                
     }
     
     // MARK: - View Will Disappear
@@ -382,18 +380,9 @@ class ReportVC: UIViewController {
                 
                 TOTAL_INCOME = incomeAmt
                 
-                TOTAL_EXPENSE = expenseAmt
+                totalNumber.text = "Rs. \(expenseAmt)"
                 
-                switch self.segmentedControl.selectedSegmentIndex {
-                    
-                case 0:
-                    self.totalNumber.text = "Rs. \(expenseAmt)"
-                case 1:
-                    self.totalNumber.text = "Rs. \(incomeAmt)"
-                default:
-                    self.totalNumber.text = "Rs. \(expenseAmt)"
-                    
-                }
+                TOTAL_EXPENSE = expenseAmt
                                 
                 self.reportTable.reloadData()
                 
@@ -636,7 +625,7 @@ extension ReportVC {
             
             reportTable.topAnchor.constraint(equalTo: historyLabel.bottomAnchor, constant: 18),
                         
-            reportTable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -120)
+            reportTable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60)
             
         ])
         
@@ -669,12 +658,11 @@ extension ReportVC {
             historyLabel.text = "Expense History"
             totalLabel.text = "Total Expense"
             let formatter = NumberFormatter()
-            formatter.locale = Locale(identifier: "ne_NP")
+            formatter.locale = Locale(identifier: "en_NP")
             formatter.numberStyle = .currency
             if let formattedTipAmount = formatter.string(from: TOTAL_EXPENSE as NSNumber) {
                 totalNumber.text = "\(formattedTipAmount)"
             }
-//            totalNumber.text = "Rs \(TOTAL_EXPENSE)"
             reportTable.reloadData()
             
         case 1:
@@ -682,12 +670,11 @@ extension ReportVC {
             historyLabel.text = "Income History"
             totalLabel.text = "Total Income"
             let formatter = NumberFormatter()
-            formatter.locale = Locale(identifier: "ne_NP")
+            formatter.locale = Locale(identifier: "en_NP")
             formatter.numberStyle = .currency
             if let formattedTipAmount = formatter.string(from: TOTAL_INCOME as NSNumber) {
                 totalNumber.text = "\(formattedTipAmount)"
             }
-//            totalNumber.text = "Rs \(TOTAL_INCOME)"
             reportTable.reloadData()
             
         default:
@@ -700,7 +687,7 @@ extension ReportVC {
     
     @objc func addBtnPressed() {
                 
-        let vc = TransactionDetailsVC()
+        let vc = AddIncomeExpenseVC()
         
         navigationController?.pushViewController(vc, animated: true)
         
@@ -719,7 +706,83 @@ extension ReportVC {
 
 extension ReportVC: UITableViewDelegate, UITableViewDataSource {
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let vc = TransactionDetailsVC()
+        
+        if segmentedControl.selectedSegmentIndex == 0 {
+         
+            vc.incomeExpenseAmount.text = "Rs. \(expense[indexPath.row].amount)"
+            
+            vc.incomeExpenseView.backgroundColor = MyColors.red.getColor().withAlphaComponent(0.1)
+            
+            vc.incomeExpenseLabel.text = "Expense"
+            
+            vc.incomeExpenseLabel.textColor = MyColors.red.getColor()
+            
+            vc.status.text = "Expense"
+            
+            vc.status.textColor = MyColors.red.getColor()
+            
+            vc.FromLabel.text = "To"
+
+            vc.from.text = expense[indexPath.row].name
+            
+            vc.time.text = expense[indexPath.row].time
+            
+            vc.date.text = expense[indexPath.row].date
+            
+            vc.total.text = "Rs. \(expense[indexPath.row].amount)"
+            
+            vc.earningsLabel.text = "Spending"
+            
+            vc.earnings.text = "Rs. \(expense[indexPath.row].amount)"
+            
+            vc.fee.text = "Rs. 0"
+            
+        } else if segmentedControl.selectedSegmentIndex == 1 {
+            
+            vc.incomeExpenseAmount.text = "Rs. \(income[indexPath.row].amount)"
+            
+            vc.incomeExpenseView.backgroundColor = MyColors.green.getColor().withAlphaComponent(0.1)
+            
+            vc.incomeExpenseLabel.text = "Income"
+            
+            vc.incomeExpenseLabel.textColor = MyColors.green.getColor()
+            
+            vc.status.text = "Income"
+            
+            vc.status.textColor = MyColors.green.getColor()
+            
+            vc.FromLabel.text = "From"
+            
+            vc.from.text = income[indexPath.row].name
+            
+            vc.time.text = income[indexPath.row].time
+            
+            vc.date.text = income[indexPath.row].date
+            
+            vc.total.text = "Rs. \(income[indexPath.row].amount)"
+            
+            vc.earningsLabel.text = "Earning"
+            
+            vc.earnings.text = "Rs. \(income[indexPath.row].amount)"
+            
+            vc.fee.text = "Rs. 0"
+
+        }
+        
+        self.navigationController?.pushViewController(vc, animated: true)
+        
+    }
+    
     func numberOfSections(in tableView: UITableView) -> Int {
+        
+        return 1
+        
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         if segmentedControl.selectedSegmentIndex == 0 {
          
@@ -732,13 +795,6 @@ extension ReportVC: UITableViewDelegate, UITableViewDataSource {
         }
         
         return 0
-        
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        return 1
-        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -749,39 +805,39 @@ extension ReportVC: UITableViewDelegate, UITableViewDataSource {
             
         case 0:
             
-            cell.nameItem.text = expense[indexPath.section].name
+            cell.nameItem.text = expense[indexPath.row].name
             
-            cell.dateItem.text = expense[indexPath.section].date
+            cell.dateItem.text = expense[indexPath.row].date
             
             cell.nameItem.textColor = MyColors.red.getColor()
             
             cell.amountTransaction.textColor = MyColors.red.getColor()
             
-            cell.amountTransaction.text = "- Rs. \(expense[indexPath.section].amount )"
+            cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
         
         case 1:
             
-            cell.nameItem.text = income[indexPath.section].name
+            cell.nameItem.text = income[indexPath.row].name
             
-            cell.dateItem.text = income[indexPath.section].date
+            cell.dateItem.text = income[indexPath.row].date
             
             cell.nameItem.textColor = MyColors.green.getColor()
             
-            cell.amountTransaction.textColor = MyColors.green.getColor()
+            cell.amountTransaction.textColor = MyColors.lightGreen.getColor()
             
-            cell.amountTransaction.text = "+ Rs. \(income[indexPath.section].amount )"
+            cell.amountTransaction.text = "+ Rs. \(income[indexPath.row].amount )"
             
         default:
             
-            cell.nameItem.text = expense[indexPath.section].name
+            cell.nameItem.text = expense[indexPath.row].name
             
-            cell.dateItem.text = expense[indexPath.section].date
+            cell.dateItem.text = expense[indexPath.row].date
             
             cell.nameItem.textColor = MyColors.red.getColor()
             
             cell.amountTransaction.textColor = MyColors.red.getColor()
             
-            cell.amountTransaction.text = "- Rs. \(expense[indexPath.section].amount )"
+            cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
             
         }
         
@@ -791,20 +847,78 @@ extension ReportVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        return 50
+        return 60
         
     }
     
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
         
-        return 0
+        return true
         
     }
     
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView()
-        headerView.backgroundColor = UIColor.clear
-        return headerView
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        if (editingStyle == UITableViewCell.EditingStyle.delete) {
+            
+            switch segmentedControl.selectedSegmentIndex {
+                
+            case 0:
+                
+                let id = expense[indexPath.row].id
+                
+                let user = Auth.auth().currentUser?.uid
+                
+                let dbref = Firestore.firestore().collection("users").document(user!).collection("transaction")
+                
+                let query : Query = dbref.whereField("id", isEqualTo: id)
+                
+                query.getDocuments(completion: { (snapshot, error) in
+                               if let error = error {
+                                   print(error.localizedDescription)
+                               } else {
+                                   for document in snapshot!.documents {
+                                       //print("\(document.documentID) => \(document.data())")
+                                       Firestore.firestore().collection("users").document((user!)).collection("transaction").document("\(document.documentID)").delete()
+                               }
+                           }})
+                
+                expense.remove(at: indexPath.row)
+                            tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            case 1:
+                
+                let id = income[indexPath.row].id
+                
+                let user = Auth.auth().currentUser?.uid
+                
+                let dbref = Firestore.firestore().collection("users").document(user!).collection("transaction")
+                
+                let query : Query = dbref.whereField("id", isEqualTo: id)
+                
+                query.getDocuments(completion: { (snapshot, error) in
+                               if let error = error {
+                                   print(error.localizedDescription)
+                               } else {
+                                   for document in snapshot!.documents {
+                                       //print("\(document.documentID) => \(document.data())")
+                                       Firestore.firestore().collection("users").document((user!)).collection("transaction").document("\(document.documentID)").delete()
+                               }
+                           }})
+                
+                income.remove(at: indexPath.row)
+                            tableView.deleteRows(at: [indexPath], with: .fade)
+                
+                self.reportTable.reloadData()
+                
+                break
+                
+            default:
+                break
+            }
+            
+        }
+        
     }
     
 }

@@ -29,6 +29,34 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
     var transactionType = TransactionType.expense
     // MARK: - Initialization
     
+    // Clear button for amount
+    
+    lazy var btnClearAmount: UIButton = {
+        
+        let btn = UIButton()
+        
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        
+        btn.backgroundColor = .clear
+        
+        return btn
+        
+    }()
+    
+    // Clear button for name
+    
+    lazy var btnClearName: UIButton = {
+        
+        let btn = UIButton()
+        
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        
+        btn.backgroundColor = .clear
+        
+        return btn
+        
+    }()
+    
     // Save button
     
     lazy var saveBtn: UIButton = {
@@ -105,6 +133,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
         date.delegate = self
         
+        date.returnKeyType = .done
+        
         date.addPadding(padding: .left(12))
         
         date.tintColor = .gray
@@ -167,6 +197,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
         amount.tintColor = .gray
         
+        amount.returnKeyType = .next
+        
         amount.autocorrectionType = .no
         
         amount.layer.cornerRadius = 8
@@ -222,6 +254,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         name.setUpImage(imageName: "cleartext", on: .right)
         
         name.tintColor = .gray
+        
+        name.returnKeyType = .next
         
         name.autocorrectionType = .no
         
@@ -510,7 +544,7 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
         let dbRef = db.collection("users").document(uid!).collection("transaction").document(randomNumber)
         
-            dbRef.setData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": transactionType.rawValue]) { err in
+            dbRef.setData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": transactionType.rawValue, "id": randomNumber]) { err in
             
             if let err = err {
                 
@@ -534,7 +568,7 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
             
             let dbRef = db.collection("users").document(uid!).collection("transaction").document(randomNumber)
             
-            dbRef.setData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": transactionType.rawValue]) { err in
+            dbRef.setData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": transactionType.rawValue, "id": randomNumber]) { err in
                 
                 if let err = err {
                     
@@ -683,6 +717,10 @@ extension AddIncomeExpenseVC {
         autoLayoutForDateField()
         
         autoLayoutForSaveBtn()
+        
+        autoLayoutForBtnClearName()
+        
+        autoLayoutForBtnClearAmount()
         
     }
     
@@ -836,6 +874,42 @@ extension AddIncomeExpenseVC {
         
     }
     
+    func autoLayoutForBtnClearName() {
+        
+        subView.addSubview(btnClearName)
+        
+        NSLayoutConstraint.activate([
+        
+            btnClearName.trailingAnchor.constraint(equalTo: nameField.trailingAnchor),
+            
+            btnClearName.topAnchor.constraint(equalTo: nameField.topAnchor),
+            
+            btnClearName.heightAnchor.constraint(equalTo: subView.heightAnchor, multiplier: 0.1),
+            
+            btnClearName.widthAnchor.constraint(equalToConstant: 44)
+        
+        ])
+        
+    }
+    
+    func autoLayoutForBtnClearAmount() {
+        
+        subView.addSubview(btnClearAmount)
+        
+        NSLayoutConstraint.activate([
+        
+            btnClearAmount.trailingAnchor.constraint(equalTo: amountField.trailingAnchor),
+            
+            btnClearAmount.topAnchor.constraint(equalTo: amountField.topAnchor),
+            
+            btnClearAmount.heightAnchor.constraint(equalTo: subView.heightAnchor, multiplier: 0.1),
+            
+            btnClearAmount.widthAnchor.constraint(equalToConstant: 44)
+        
+        ])
+        
+    }
+    
 }
 
 // MARK: - Actions for UIComponents
@@ -851,6 +925,11 @@ extension AddIncomeExpenseVC {
         saveBtn.addTarget(self, action: #selector(saveBtnTapped), for: .touchUpInside)
         
         segmentedControl.addTarget(self, action: #selector(segmentedValueChange), for: .valueChanged)
+        
+        btnClearName.addTarget(self, action: #selector(clearNameBtnTapped), for: .touchUpInside)
+        
+        btnClearAmount.addTarget(self, action: #selector(clearAmountBtnTapped), for: .touchUpInside)
+
         
     }
     
@@ -930,6 +1009,18 @@ extension AddIncomeExpenseVC {
         dateField.text = formatter.string(from: datePicker.date)
         
         self.view.endEditing(true)
+        
+    }
+    
+    @objc func clearNameBtnTapped() {
+        
+        nameField.text = ""
+        
+    }
+    
+    @objc func clearAmountBtnTapped() {
+        
+        amountField.text = ""
         
     }
     

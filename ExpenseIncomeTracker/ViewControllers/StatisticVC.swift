@@ -8,28 +8,104 @@
 import Charts
 import DropDown
 import UIKit
+import FirebaseAuth
+import FirebaseFirestore
+import Firebase
+import LoadingView
 
 class StatisticVC: UIViewController, ChartViewDelegate {
-        
+    
     // MARK: - Initialization
+    
+    // Table view for Statistics details
+    
+    lazy var statisticsTable: UITableView = {
+        
+        let table = UITableView()
+        
+        table.translatesAutoresizingMaskIntoConstraints = false
+        
+        table.backgroundColor = .clear
+        
+        table.separatorStyle = .none
+        
+        table.showsVerticalScrollIndicator = false
+        
+        table.isScrollEnabled = true
+        
+        table.register(CellTransactionItem.self, forCellReuseIdentifier: "cellTransaction")
+        
+        table.delegate = self
+        
+        table.dataSource = self
+        
+        return table
+        
+    }()
+    
+    // Top spending label
+    
+    lazy var lblTopSpending: UILabel = {
+        
+        let label = UILabel()
+        
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        label.text = "Top Spending"
+        
+        label.numberOfLines = 1
+        
+        label.textColor = .black
+        
+        label.font = UIFont(name: "Inter-SemiBold", size: 18)
+        
+        return label
+        
+    }()
     
     // Line Chart
     
     lazy var lineChart: LineChartView = {
         
-        let chart = LineChartView()
+        let view = LineChartView()
         
-        chart.translatesAutoresizingMaskIntoConstraints = false
+        view.translatesAutoresizingMaskIntoConstraints = false
         
-        chart.delegate = self
+        view.delegate = self
         
-        chart.xAxis.drawAxisLineEnabled = false
+        view.rightAxis.enabled = false
         
-        chart.leftAxis.drawAxisLineEnabled = false
+        view.leftAxis.enabled = false
         
-        chart.legend.enabled = false
+        view.drawGridBackgroundEnabled = false
         
-        return chart
+        let x = view.xAxis
+        
+        x.enabled = true
+        
+        x.labelPosition = .bottom
+        
+        x.drawGridLinesEnabled = false
+        
+        x.axisLineColor = MyColors.darkGreen.getColor()
+        
+//        x.axisLineColor = UIColor(hexString: "#EFEFEF")
+        
+        view.dragEnabled = false
+        
+        view.setScaleEnabled(false)
+        
+        view.pinchZoomEnabled = false
+        
+        view.drawGridBackgroundEnabled = false
+        
+        view.noDataText = "No Transaction History Found"
+        
+        view.legend.enabled = false
+        
+        view.noDataTextColor = MyColors.gray.getColor()
+        
+        return view
         
     }()
     
@@ -95,11 +171,11 @@ class StatisticVC: UIViewController, ChartViewDelegate {
     
     lazy var incomeExpenseDropDown: DropDown = {
         
-       let drop = DropDown()
+        let drop = DropDown()
         
         drop.dataSource = [
-        "Expense",
-        "Income"
+            "Expense",
+            "Income"
         ]
         
         drop.selectRow(at: 0)
@@ -131,7 +207,7 @@ class StatisticVC: UIViewController, ChartViewDelegate {
         cv.delegate = self
         
         cv.dataSource = self
-                
+        
         return cv
         
     }()
@@ -200,6 +276,12 @@ class StatisticVC: UIViewController, ChartViewDelegate {
     
     var yPosition = ["1", "0.5", "0.7", "1", "0.4"]
     
+    var income = [Transaction]()
+    
+    var expense = [Transaction]()
+    
+    var modelTransaction: [Transaction]?
+        
     // MARK: - View Did Load
     
     override func viewDidLoad() {
@@ -209,8 +291,10 @@ class StatisticVC: UIViewController, ChartViewDelegate {
         view.backgroundColor = .white
         
         timeCollectionView.register(CellStatisticTimePeriod.self, forCellWithReuseIdentifier: "cellStatisticTime")
-                
+        
         selectDropDown()
+        
+        getData()
         
         lineChartDataEntry()
         
@@ -237,7 +321,7 @@ class StatisticVC: UIViewController, ChartViewDelegate {
     // Drop down selection
     
     func selectDropDown() {
-        
+                
         incomeExpenseDropDown.selectionAction = { index, title in
             
             if index == 0 {
@@ -257,33 +341,135 @@ class StatisticVC: UIViewController, ChartViewDelegate {
     }
     
     func lineChartDataEntry() {
+            
+//        let set1 = LineChartDataSet(entries: values, label: "DataSet 1")
+//            set1.mode = .cubicBezier
+//            set1.cubicIntensity = 0.2
+//            set1.cubicIntensity = 0.2
+//            set1.drawFilledEnabled = true
+//            set1.drawCirclesEnabled = true
+//            set1.lineWidth = 2
+//            set1.circleRadius = 3
+//        set1.setCircleColor(MyColors.green.getColor())
+//            set1.circleHoleColor = MyColors.green.getColor()
+//            set1.colors = [MyColors.green.getColor()]
+//            set1.fillColor = MyColors.darkGreen.getColor().withAlphaComponent(0.4)
+//            set1.valueTextColor = MyColors.darkGreen.getColor()
+//            set1.drawValuesEnabled = false
+//            set1.drawVerticalHighlightIndicatorEnabled = false
+//            set1.drawHorizontalHighlightIndicatorEnabled = false
         
         for x in 0..<5 {
 
             dataEntriesChart.append(ChartDataEntry(x: Double(x), y: Double.random(in: 0...5)))
 
         }
-    
+
         let set = LineChartDataSet(dataEntriesChart)
-        
+
         set.mode = .cubicBezier
-        
+
         set.colors = ChartColorTemplates.material()
-                        
+
         let gradientColors = [MyColors.darkGreen.getColor().cgColor, UIColor.clear.cgColor] as CFArray // Colors of the gradient
-        
+
         let colorLocations:[CGFloat] = [0.2, 0.0] // Positioning of the gradient
-        
-        let gradient = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations) // Gradient Object
-        
+
+        let gradient = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations)
+
         set.fill = LinearGradientFill(gradient: gradient!, angle: 90)
-        
-        // Set the Gradient
+
         set.drawFilledEnabled = true
-        
+
         let data = LineChartData(dataSet: set)
-        
+
         lineChart.data = data
+        
+    }
+    
+    func getData() {
+        
+        statisticsTable.startSpinning(color: .gray)
+        
+        let db = Firestore.firestore()
+        
+        let uid = Auth.auth().currentUser?.uid
+        
+        let docRef = db.collection("users").document(uid!).collection("transaction")
+        
+        docRef.getDocuments() { [self] (querySnapshot, err) in
+            
+            self.statisticsTable.stopSpinning()
+            
+            if let err = err {
+                
+                print("Error getting documents: \(err)")
+                
+            } else {
+                
+                var expenseList = [Transaction]()
+                
+                var sum = [String]()
+                
+                for document in querySnapshot!.documents {
+                    
+                    print("\(document.documentID) => \(document.data())")
+                    
+                    do {
+                        
+                        let jsonData = try JSONSerialization.data(withJSONObject: document.data(), options: .prettyPrinted)
+                        
+                        print("JSON Data = \(jsonData.description)")
+                        
+                        let decoder = JSONDecoder()
+                        
+                        do {
+                            
+                            let decoded = try decoder.decode(Transaction.self, from: jsonData)
+                            
+                            expenseList.append(decoded)
+                            
+                            sum.append(decoded.amount)
+                            
+                        } catch {
+                            
+                            print("Failed to decode JSON")
+                            
+                        }
+                        
+                    } catch {
+                        
+                        print(error.localizedDescription)
+                        
+                    }
+                    
+                }
+                
+                self.modelTransaction = expenseList
+
+                
+                for i in expenseList {
+                                            
+                    switch i.type {
+                        
+                    case TransactionType.income.rawValue:
+                        self.income.append(i)
+
+                    case TransactionType.expense.rawValue:
+                        self.expense.append(i)
+
+                    default:
+                        break
+                        
+                    }
+                                            
+                }
+                                
+                self.statisticsTable.reloadData()
+                
+            }
+            
+        }
         
     }
     
@@ -313,6 +499,10 @@ extension StatisticVC {
         
         autoLayoutForLineChart()
         
+        autoLayoutForLblTopSpending()
+        
+        autoLayoutForStatisticsTable()
+        
     }
     
     // MARK: - Autolayout
@@ -322,11 +512,11 @@ extension StatisticVC {
         view.addSubview(addTitle)
         
         NSLayoutConstraint.activate([
-        
+            
             addTitle.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
             
             addTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-        
+            
         ])
         
     }
@@ -354,7 +544,7 @@ extension StatisticVC {
         view.addSubview(downloadBtn)
         
         NSLayoutConstraint.activate([
-        
+            
             downloadBtn.centerYAnchor.constraint(equalTo: addTitle.centerYAnchor),
             
             downloadBtn.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
@@ -362,7 +552,7 @@ extension StatisticVC {
             downloadBtn.heightAnchor.constraint(equalToConstant: 24),
             
             downloadBtn.widthAnchor.constraint(equalToConstant: 24)
-        
+            
         ])
         
     }
@@ -372,15 +562,15 @@ extension StatisticVC {
         view.addSubview(timeCollectionView)
         
         NSLayoutConstraint.activate([
-        
+            
             timeCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             
             timeCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            timeCollectionView.topAnchor.constraint(equalTo: addTitle.bottomAnchor, constant: 42),
+            timeCollectionView.topAnchor.constraint(equalTo: addTitle.bottomAnchor, constant: 36),
             
             timeCollectionView.heightAnchor.constraint(equalToConstant: 40)
-        
+            
         ])
         
     }
@@ -390,15 +580,15 @@ extension StatisticVC {
         view.addSubview(dropView)
         
         NSLayoutConstraint.activate([
-        
+            
             dropView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             
-            dropView.heightAnchor.constraint(equalToConstant: 40),
+            dropView.heightAnchor.constraint(equalToConstant: 36),
             
             dropView.widthAnchor.constraint(equalToConstant: 120),
             
-            dropView.topAnchor.constraint(equalTo: timeCollectionView.bottomAnchor, constant: 26)
-        
+            dropView.topAnchor.constraint(equalTo: timeCollectionView.bottomAnchor, constant: 20)
+            
         ])
         
     }
@@ -408,7 +598,7 @@ extension StatisticVC {
         dropView.addSubview(dropDownIcon)
         
         NSLayoutConstraint.activate([
-        
+            
             dropDownIcon.trailingAnchor.constraint(equalTo: dropView.trailingAnchor, constant: -12),
             
             dropDownIcon.centerYAnchor.constraint(equalTo: dropView.centerYAnchor),
@@ -416,7 +606,7 @@ extension StatisticVC {
             dropDownIcon.heightAnchor.constraint(equalToConstant: 10),
             
             dropDownIcon.widthAnchor.constraint(equalToConstant: 12)
-        
+            
         ])
         
     }
@@ -426,11 +616,11 @@ extension StatisticVC {
         dropView.addSubview(dropDownLabel)
         
         NSLayoutConstraint.activate([
-        
+            
             dropDownLabel.leadingAnchor.constraint(equalTo: dropView.leadingAnchor, constant: 12),
             
             dropDownLabel.centerYAnchor.constraint(equalTo: dropView.centerYAnchor),
-                    
+            
         ])
         
     }
@@ -446,7 +636,7 @@ extension StatisticVC {
         view.addSubview(lineChart)
         
         NSLayoutConstraint.activate([
-        
+            
             lineChart.topAnchor.constraint(equalTo: dropView.bottomAnchor, constant: 32),
             
             lineChart.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
@@ -454,6 +644,38 @@ extension StatisticVC {
             lineChart.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
             
             lineChart.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.2)
+            
+        ])
+        
+    }
+    
+    func autoLayoutForLblTopSpending() {
+        
+        view.addSubview(lblTopSpending)
+        
+        NSLayoutConstraint.activate([
+        
+            lblTopSpending.topAnchor.constraint(equalTo: lineChart.bottomAnchor, constant: 32),
+            
+            lblTopSpending.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
+        
+        ])
+        
+    }
+    
+    func autoLayoutForStatisticsTable() {
+        
+        view.addSubview(statisticsTable)
+        
+        NSLayoutConstraint.activate([
+        
+            statisticsTable.leadingAnchor.constraint(equalTo: lblTopSpending.leadingAnchor),
+            
+            statisticsTable.topAnchor.constraint(equalTo: lblTopSpending.bottomAnchor, constant: 20),
+            
+            statisticsTable.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            
+            statisticsTable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60)
         
         ])
         
@@ -553,6 +775,111 @@ extension StatisticVC: UICollectionViewDelegate, UICollectionViewDataSource, UIC
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         
         return CGSize(width: (timeCollectionView.frame.size.width / 5) - 10, height: timeCollectionView.frame.size.height)
+        
+    }
+    
+}
+
+extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+//        incomeExpenseDropDown.selectionAction = {(index: Int, item: String) in
+//
+//            switch index {
+//
+//            case 0:
+//
+//                return self.expense.count
+//
+//            case 1:
+//
+//                return self.income.count
+//
+//            default:
+//
+//                return self.expense.count
+//            }
+//
+//        }
+        
+        return expense.count
+        
+    }
+
+
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        
+        return 1
+        
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cellTransaction", for: indexPath) as! CellTransactionItem
+        
+        incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
+         
+            switch index {
+                
+            case 0:
+                
+                cell.nameItem.text = expense[indexPath.row].name
+
+                cell.dateItem.text = expense[indexPath.row].date
+
+                cell.nameItem.textColor = MyColors.red.getColor()
+
+                cell.amountTransaction.textColor = MyColors.red.getColor()
+
+                cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
+                
+            case 1:
+                
+                cell.nameItem.text = income[indexPath.row].name
+
+                cell.dateItem.text = income[indexPath.row].date
+
+                cell.nameItem.textColor = MyColors.green.getColor()
+
+                cell.amountTransaction.textColor = MyColors.lightGreen.getColor()
+
+                cell.amountTransaction.text = "+ Rs. \(income[indexPath.row].amount )"
+                
+            default:
+                
+                cell.nameItem.text = expense[indexPath.row].name
+
+                cell.dateItem.text = expense[indexPath.row].date
+
+                cell.nameItem.textColor = MyColors.red.getColor()
+
+                cell.amountTransaction.textColor = MyColors.red.getColor()
+
+                cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
+                
+            }
+            
+        }
+
+            cell.nameItem.text = expense[indexPath.row].name
+
+            cell.dateItem.text = expense[indexPath.row].date
+
+            cell.nameItem.textColor = MyColors.red.getColor()
+
+            cell.amountTransaction.textColor = MyColors.red.getColor()
+
+            cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
+        
+        return cell
+        
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        
+        return 60
         
     }
     

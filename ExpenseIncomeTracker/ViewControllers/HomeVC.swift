@@ -15,6 +15,46 @@ class HomeVC: UIViewController {
 
     // MARK: - Initialization
     
+    // No data text view
+    
+    lazy var lblNoData: UILabel = {
+
+        let label = UILabel()
+
+        label.translatesAutoresizingMaskIntoConstraints = false
+
+        label.text = "No Data Found"
+
+        label.numberOfLines = 1
+
+        label.textColor = MyColors.red.getColor()
+
+        label.font = UIFont(name: "Inter-Bold", size: 16)
+        
+        label.isHidden = true
+
+        return label
+
+    }()
+    
+    // No Data Img view
+    
+    lazy var imgNoData: UIImageView = {
+        
+        let img = UIImageView()
+        
+        img.translatesAutoresizingMaskIntoConstraints = false
+        
+        img.image = UIImage(named: "nodata")
+        
+        img.contentMode = .scaleToFill
+        
+        img.isHidden = true
+        
+        return img
+        
+    }()
+    
     // Table view for Transaction details
 
     lazy var transactionTable: UITableView = {
@@ -95,7 +135,9 @@ class HomeVC: UIViewController {
 
         label.translatesAutoresizingMaskIntoConstraints = false
 
-        label.text = "$ 284.00"
+//        label.text = "$ 284.00"
+        
+        label.text = "Rs. \(TOTAL_EXPENSE.string)"
 
         label.numberOfLines = 1
 
@@ -155,7 +197,9 @@ class HomeVC: UIViewController {
 
         label.translatesAutoresizingMaskIntoConstraints = false
 
-        label.text = "$ 1,840.00"
+//        label.text = "$ 1,840.00"
+        
+        label.text = "Rs. \(TOTAL_INCOME.string)"
 
         label.textColor = .white
 
@@ -441,6 +485,8 @@ class HomeVC: UIViewController {
         let docRef = db.collection("users").document(uid!).collection("transaction")
 
         docRef.getDocuments() { (querySnapshot, err) in
+            
+            self.transactionTable.reloadData()
 
             self.transactionTable.stopSpinning()
 
@@ -502,8 +548,41 @@ class HomeVC: UIViewController {
                 let total = doubles.reduce(0.0, {(sum: Double, item:Double) -> Double in
                           return sum + item
                 })
+                
+                var incomeAmt = 0.0
+                
+                var expenseAmt = 0.0
+                
+                for i in expenseList {
+                                            
+                    switch i.type {
+                        
+                    case TransactionType.income.rawValue:
+                        incomeAmt += Double(i.amount) ?? 0.0
+
+                    case TransactionType.expense.rawValue:
+                        expenseAmt += Double(i.amount) ?? 0.0
+
+                    default:
+                        break
+                        
+                    }
+                                            
+                }
+                
+                TOTAL_INCOME = incomeAmt
+                                
+                TOTAL_EXPENSE = expenseAmt
+                
+                self.expenseNumber.text = "Rs. \(expenseAmt)"
+                
+                self.incomeNumber.text = "Rs. \(incomeAmt)"
                                 
                 self.totalBalanceNumber.text = "Rs. \(total.string)"
+                
+                let totalBalance = incomeAmt - expenseAmt
+                
+                self.totalBalanceNumber.text = "Rs. \(totalBalance)"
                 
                 self.transactionTable.reloadData()
 
@@ -867,6 +946,10 @@ extension HomeVC {
         autoLayoutForSeeAll()
 
         autoLayoutForTransactionTable()
+        
+        autoLayoutForImgNoData()
+        
+        autoLayoutForLblNoData()
 
     }
 
@@ -915,6 +998,38 @@ extension HomeVC {
             ])
 
     }
+    
+    func autoLayoutForImgNoData() {
+        
+        view.addSubview(imgNoData)
+        
+        NSLayoutConstraint.activate([
+            
+            imgNoData.topAnchor.constraint(equalTo: transactionHistory.bottomAnchor, constant: 40),
+                        
+            imgNoData.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                        
+            imgNoData.heightAnchor.constraint(equalToConstant: 150),
+            
+            imgNoData.widthAnchor.constraint(equalToConstant: 150)
+        
+        ])
+        
+    }
+    
+    func autoLayoutForLblNoData() {
+
+        view.addSubview(lblNoData)
+
+        NSLayoutConstraint.activate([
+
+            lblNoData.centerXAnchor.constraint(equalTo: imgNoData.centerXAnchor),
+
+            lblNoData.topAnchor.constraint(equalTo: imgNoData.bottomAnchor, constant: 10)
+
+        ])
+
+    }
 
 }
 
@@ -952,47 +1067,64 @@ extension HomeVC {
 extension HomeVC: UITableViewDelegate, UITableViewDataSource {
 
     func numberOfSections(in tableView: UITableView) -> Int {
-
-        return 3
+        
+        return 1
 
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-        return 1
+//        if modelTransactionData?.count == 0 {
+//            
+//            imgNoData.isHidden = false
+//            
+//            lblNoData.isHidden = false
+//
+//            return 0
+//            
+//        } else if modelTransactionData?.count == 1 {
+//            
+//            imgNoData.isHidden = true
+//            
+//            lblNoData.isHidden = true
+//
+//            return 1
+//            
+//        } else if modelTransactionData?.count == 2 {
+//            
+//            imgNoData.isHidden = true
+//            
+//            lblNoData.isHidden = true
+//
+//            return 2
+//            
+//        } else if modelTransactionData?.count ?? 0 > 3 {
+//            
+//            imgNoData.isHidden = true
+//            
+//            lblNoData.isHidden = true
+//
+//            return 3
+//            
+//        }
 
+        return modelTransactionData?.count ?? 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellTransaction", for: indexPath) as! CellTransactionItem
 
-        cell.nameItem.text = modelTransactionData?[indexPath.section].name
-
-        cell.dateItem.text = modelTransactionData?[indexPath.section].date
-
-        cell.amountTransaction.text = "Rs. \(modelTransactionData?[indexPath.section].amount ?? "")"
+        cell.loadData(data: modelTransactionData?[indexPath.row])
 
         return cell
 
     }
-
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-
-        return 50
-
-    }
-
-    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
-
-        return 0
-
-    }
-
-    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        let headerView = UIView()
-        headerView.backgroundColor = UIColor.clear
-        return headerView
+        
+        return 60
+        
     }
 
 }

@@ -14,30 +14,6 @@ import GoogleSignIn
 class LoginVC: UIViewController, UITextFieldDelegate {
 
     // MARK: - Initialization
-    
-    // Facebook button
-    
-//    lazy var facebookSignInBtn: UIButton = {
-//
-//        let btn = UIButton()
-//
-//        btn.translatesAutoresizingMaskIntoConstraints = false
-//
-//        btn.backgroundColor = .white
-//
-//        btn.layer.cornerRadius = 25
-//
-//        btn.layer.shadowColor = MyColors.lightGray.getColor().cgColor
-//
-//        btn.layer.shadowRadius = 10
-//
-//        btn.layer.shadowOpacity = 0.7
-//
-//        btn.setImage(UIImage(named: "facebookLogo"), for: .normal)
-//
-//        return btn
-//
-//    }()
 
     // Center line
 
@@ -769,7 +745,9 @@ extension LoginVC {
 
         NSLayoutConstraint.activate([
 
-            googleSignInBtn.trailingAnchor.constraint(equalTo: centerView.leadingAnchor, constant: -20),
+//            googleSignInBtn.trailingAnchor.constraint(equalTo: centerView.leadingAnchor, constant: -20),
+            
+            googleSignInBtn.centerXAnchor.constraint(equalTo: centerView.centerXAnchor),
 
             googleSignInBtn.topAnchor.constraint(equalTo: orLabel.bottomAnchor, constant: 24),
 

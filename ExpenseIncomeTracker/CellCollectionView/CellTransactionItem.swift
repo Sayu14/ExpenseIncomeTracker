@@ -117,6 +117,29 @@ class CellTransactionItem: UITableViewCell {
         
     }
     
+    func loadData(data: Transaction?) {
+        
+        nameItem.text = data?.name ?? ""
+
+        dateItem.text = data?.date ?? ""
+        
+        if data?.type == TransactionType.income.rawValue {
+            
+            amountTransaction.textColor = MyColors.lightGreen.getColor()
+            
+            amountTransaction.text = "+ Rs. \(data?.amount ?? "")"
+            
+        } else {
+            
+            amountTransaction.textColor = MyColors.red.getColor()
+            
+            amountTransaction.text = "- Rs. \(data?.amount ?? "")"
+            
+        }
+        
+        
+    }
+    
 }
 
 extension CellTransactionItem {
@@ -143,11 +166,15 @@ extension CellTransactionItem {
         
             viewImg.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             
-            viewImg.topAnchor.constraint(equalTo: contentView.topAnchor),
+//            viewImg.topAnchor.constraint(equalTo: contentView.topAnchor),
+//
+//            viewImg.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-            viewImg.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            viewImg.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
-            viewImg.widthAnchor.constraint(equalToConstant: 50)
+            viewImg.widthAnchor.constraint(equalToConstant: 50),
+            
+            viewImg.heightAnchor.constraint(equalToConstant: 50)
         
         ])
         

@@ -20,6 +20,7 @@ struct Transaction: Codable {
     
     let type: String
     
+    let id: String
 }
 
 
