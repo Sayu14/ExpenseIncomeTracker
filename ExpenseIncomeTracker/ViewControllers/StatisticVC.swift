@@ -13,8 +13,8 @@ import FirebaseFirestore
 import Firebase
 import LoadingView
 
-class StatisticVC: UIViewController, ChartViewDelegate {
-    
+class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate {
+
     // MARK: - Initialization
     
     // Table view for Statistics details
@@ -88,9 +88,7 @@ class StatisticVC: UIViewController, ChartViewDelegate {
         x.drawGridLinesEnabled = false
         
         x.axisLineColor = MyColors.darkGreen.getColor()
-        
-//        x.axisLineColor = UIColor(hexString: "#EFEFEF")
-        
+                
         view.dragEnabled = false
         
         view.setScaleEnabled(false)
@@ -109,63 +107,101 @@ class StatisticVC: UIViewController, ChartViewDelegate {
         
     }()
     
+    // Drop down text field
+    
+    lazy var dropDownField: UITextField = {
+        
+        let amount = UITextField()
+        
+        amount.translatesAutoresizingMaskIntoConstraints = false
+        
+        amount.textColor = MyColors.gray.getColor()
+        
+        amount.font = UIFont(name: "Inter-Medium", size: 14)
+        
+        amount.borderStyle = .none
+        
+        amount.addPadding(padding: .left(12))
+        
+        amount.rightViewMode = .whileEditing
+        
+        amount.delegate = self
+        
+        amount.text = "Select"
+        
+        amount.keyboardType = .decimalPad
+        
+        amount.setupImage(imageName: "chevron.down", on: .right)
+        
+        amount.tintColor = .gray
+                        
+        amount.layer.cornerRadius = 10
+        
+        amount.layer.borderColor = MyColors.gray.getColor().cgColor
+        
+        amount.layer.borderWidth = 1
+        
+        return amount
+        
+    }()
+    
     // Drop down icon
-    
-    lazy var dropDownIcon: UIImageView = {
-        
-        let img = UIImageView()
-        
-        img.translatesAutoresizingMaskIntoConstraints = false
-        
-        img.image = UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(pointSize: 4, weight: .bold))
-        
-        img.tintColor = MyColors.gray.getColor()
-        
-        img.contentMode = .scaleToFill
-        
-        return img
-        
-    }()
-    
+//
+//    lazy var dropDownIcon: UIImageView = {
+//
+//        let img = UIImageView()
+//
+//        img.translatesAutoresizingMaskIntoConstraints = false
+//
+//        img.image = UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(pointSize: 4, weight: .bold))
+//
+//        img.tintColor = MyColors.gray.getColor()
+//
+//        img.contentMode = .scaleToFill
+//
+//        return img
+//
+//    }()
+//
     // UI label in dropdown view
-    
-    lazy var dropDownLabel: UILabel = {
-        
-        let label = UILabel()
-        
-        label.translatesAutoresizingMaskIntoConstraints = false
-        
-        label.text = "Expense"
-        
-        label.numberOfLines = 1
-        
-        label.textColor = MyColors.gray.getColor()
-        
-        label.font = UIFont(name: "Inter-Medium", size: 14)
-        
-        return label
-        
-    }()
-    
+//
+//    lazy var dropDownLabel: UILabel = {
+//
+//        let label = UILabel()
+//
+//        label.translatesAutoresizingMaskIntoConstraints = false
+//
+//        label.text = "Expense"
+//
+//        label.numberOfLines = 1
+//
+//        label.textColor = MyColors.gray.getColor()
+//
+//        label.font = UIFont(name: "Inter-Medium", size: 14)
+//
+//        return label
+//
+//    }()
+//
     // UI View for drop down
-    
-    lazy var dropView: UIView = {
-        
-        let view = UIView()
-        
-        view.translatesAutoresizingMaskIntoConstraints = false
-        
-        view.layer.borderWidth = 1
-        
-        view.backgroundColor = .white
-        
-        view.layer.borderColor = MyColors.gray.getColor().cgColor
-        
-        view.layer.cornerRadius = 10
-        
-        return view
-        
-    }()
+//
+//    lazy var dropView: UIView = {
+//
+//        let view = UIView()
+//
+//        view.translatesAutoresizingMaskIntoConstraints = false
+//
+//        view.layer.borderWidth = 1
+//
+//        view.backgroundColor = .white
+//
+//        view.layer.borderColor = MyColors.gray.getColor().cgColor
+//
+//        view.layer.cornerRadius = 10
+//
+//        return view
+//
+//    }()
     
     // Drop Down
     
@@ -248,22 +284,6 @@ class StatisticVC: UIViewController, ChartViewDelegate {
         
     }()
     
-    // Back Button
-    
-    lazy var backBtn: UIButton = {
-        
-        let btn = UIButton()
-        
-        btn.translatesAutoresizingMaskIntoConstraints = false
-        
-        btn.setImage(UIImage(systemName: "chevron.left", withConfiguration: UIImage.SymbolConfiguration(pointSize: 12, weight: .bold)), for: .normal)
-        
-        btn.tintColor = .black
-        
-        return btn
-        
-    }()
-    
     // MARK: - Constants and Variables
     
     let timeArray = ["Day", "Week", "Month", "Year"]
@@ -279,8 +299,12 @@ class StatisticVC: UIViewController, ChartViewDelegate {
     var income = [Transaction]()
     
     var expense = [Transaction]()
-    
+        
     var modelTransaction: [Transaction]?
+    
+    var randomArr = [1, 3, 4, 10, 5, 9, 2]
+    
+    var dropDownList = ["Select","Expense", "Income"]
         
     // MARK: - View Did Load
     
@@ -291,13 +315,17 @@ class StatisticVC: UIViewController, ChartViewDelegate {
         view.backgroundColor = .white
         
         timeCollectionView.register(CellStatisticTimePeriod.self, forCellWithReuseIdentifier: "cellStatisticTime")
-        
-        selectDropDown()
-        
+                
         getData()
         
         lineChartDataEntry()
         
+//        let incomeTop = income.sorted(by: {$0.amount > $1.amount})
+//
+//        print("top to bottom is \(incomeTop)")
+        
+        createPickerView()
+                        
         setupLayout()
         
         setupUIAction()
@@ -318,46 +346,7 @@ class StatisticVC: UIViewController, ChartViewDelegate {
     
     // MARK: - Additional Functions
     
-    // Drop down selection
-    
-    func selectDropDown() {
-                
-        incomeExpenseDropDown.selectionAction = { index, title in
-            
-            if index == 0 {
-                
-                print("expense")
-                
-            } else if index == 1 {
-                
-                print("income")
-                
-            }
-            
-            self.dropDownLabel.text = title
-            
-        }
-        
-    }
-    
     func lineChartDataEntry() {
-            
-//        let set1 = LineChartDataSet(entries: values, label: "DataSet 1")
-//            set1.mode = .cubicBezier
-//            set1.cubicIntensity = 0.2
-//            set1.cubicIntensity = 0.2
-//            set1.drawFilledEnabled = true
-//            set1.drawCirclesEnabled = true
-//            set1.lineWidth = 2
-//            set1.circleRadius = 3
-//        set1.setCircleColor(MyColors.green.getColor())
-//            set1.circleHoleColor = MyColors.green.getColor()
-//            set1.colors = [MyColors.green.getColor()]
-//            set1.fillColor = MyColors.darkGreen.getColor().withAlphaComponent(0.4)
-//            set1.valueTextColor = MyColors.darkGreen.getColor()
-//            set1.drawValuesEnabled = false
-//            set1.drawVerticalHighlightIndicatorEnabled = false
-//            set1.drawHorizontalHighlightIndicatorEnabled = false
         
         for x in 0..<5 {
 
@@ -371,7 +360,7 @@ class StatisticVC: UIViewController, ChartViewDelegate {
 
         set.colors = ChartColorTemplates.material()
 
-        let gradientColors = [MyColors.darkGreen.getColor().cgColor, UIColor.clear.cgColor] as CFArray // Colors of the gradient
+        let gradientColors = [MyColors.darkGreen.getColor().cgColor, UIColor.clear.cgColor] as CFArray
 
         let colorLocations:[CGFloat] = [0.2, 0.0] // Positioning of the gradient
 
@@ -408,9 +397,7 @@ class StatisticVC: UIViewController, ChartViewDelegate {
             } else {
                 
                 var expenseList = [Transaction]()
-                
-                var sum = [String]()
-                
+                                
                 for document in querySnapshot!.documents {
                     
                     print("\(document.documentID) => \(document.data())")
@@ -428,9 +415,7 @@ class StatisticVC: UIViewController, ChartViewDelegate {
                             let decoded = try decoder.decode(Transaction.self, from: jsonData)
                             
                             expenseList.append(decoded)
-                            
-                            sum.append(decoded.amount)
-                            
+                                                        
                         } catch {
                             
                             print("Failed to decode JSON")
@@ -473,6 +458,58 @@ class StatisticVC: UIViewController, ChartViewDelegate {
         
     }
     
+    func createPickerView() {
+        
+           let pickerView = UIPickerView()
+        
+           pickerView.delegate = self
+        
+           dropDownField.inputView = pickerView
+        
+    }
+    
+    func dismissPickerView() {
+        
+       let toolBar = UIToolbar()
+        
+       toolBar.sizeToFit()
+        
+        let button = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(dropDropDone))
+        
+       toolBar.setItems([button], animated: true)
+        
+       toolBar.isUserInteractionEnabled = true
+        
+       dropDownField.inputAccessoryView = toolBar
+        
+    }
+    
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+
+        return 1
+
+    }
+
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+
+        return dropDownList.count
+
+    }
+
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+
+        return dropDownList[row]
+
+    }
+
+    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
+
+        let selectedDrop = dropDownList[row]
+        
+        dropDownField.text = selectedDrop
+
+    }
+    
 }
 
 // MARK: - Autolayout for UICOmponents
@@ -482,27 +519,27 @@ extension StatisticVC {
     func setupLayout() {
         
         autoLayoutForTitle()
-        
-        autoLayoutForBackBtn()
-        
+                
         autoLayoutForDownloadBtn()
         
         autoLayoutForTimeCollectionView()
+//
+//        autoLayoutForDropView()
+//
+//        autoLayoutForDropDown()
+//
+//        autoLayoutForDropLabel()
+//
+//        autoLayoutForDropIcon()
         
-        autoLayoutForDropView()
-        
-        autoLayoutForDropDown()
-        
-        autoLayoutForDropLabel()
-        
-        autoLayoutForDropIcon()
+        autoLayoutForDropDownField()
         
         autoLayoutForLineChart()
         
         autoLayoutForLblTopSpending()
         
         autoLayoutForStatisticsTable()
-        
+                
     }
     
     // MARK: - Autolayout
@@ -516,24 +553,6 @@ extension StatisticVC {
             addTitle.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
             
             addTitle.centerXAnchor.constraint(equalTo: view.centerXAnchor)
-            
-        ])
-        
-    }
-    
-    func autoLayoutForBackBtn() {
-        
-        view.addSubview(backBtn)
-        
-        NSLayoutConstraint.activate([
-            
-            backBtn.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 28),
-            
-            backBtn.centerYAnchor.constraint(equalTo: addTitle.centerYAnchor),
-            
-            backBtn.heightAnchor.constraint(equalToConstant: 20),
-            
-            backBtn.widthAnchor.constraint(equalToConstant: 20)
             
         ])
         
@@ -575,59 +594,77 @@ extension StatisticVC {
         
     }
     
-    func autoLayoutForDropView() {
+//    func autoLayoutForDropView() {
+//
+//        view.addSubview(dropView)
+//
+//        NSLayoutConstraint.activate([
+//
+//            dropView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+//
+//            dropView.heightAnchor.constraint(equalToConstant: 36),
+//
+//            dropView.widthAnchor.constraint(equalToConstant: 120),
+//
+//            dropView.topAnchor.constraint(equalTo: timeCollectionView.bottomAnchor, constant: 20)
+//
+//        ])
+//
+//    }
+//
+//    func autoLayoutForDropIcon() {
+//
+//        dropView.addSubview(dropDownIcon)
+//
+//        NSLayoutConstraint.activate([
+//
+//            dropDownIcon.trailingAnchor.constraint(equalTo: dropView.trailingAnchor, constant: -12),
+//
+//            dropDownIcon.centerYAnchor.constraint(equalTo: dropView.centerYAnchor),
+//
+//            dropDownIcon.heightAnchor.constraint(equalToConstant: 10),
+//
+//            dropDownIcon.widthAnchor.constraint(equalToConstant: 12)
+//
+//        ])
+//
+//    }
+//
+//    func autoLayoutForDropLabel() {
+//
+//        dropView.addSubview(dropDownLabel)
+//
+//        NSLayoutConstraint.activate([
+//
+//            dropDownLabel.leadingAnchor.constraint(equalTo: dropView.leadingAnchor, constant: 12),
+//
+//            dropDownLabel.centerYAnchor.constraint(equalTo: dropView.centerYAnchor),
+//
+//        ])
+//
+//    }
+    
+//    func autoLayoutForDropDown() {
+//
+//        incomeExpenseDropDown.anchorView = dropView
+//
+//    }
+    
+    func autoLayoutForDropDownField() {
         
-        view.addSubview(dropView)
+        view.addSubview(dropDownField)
         
         NSLayoutConstraint.activate([
+        
+            dropDownField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             
-            dropView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            dropDownField.heightAnchor.constraint(equalToConstant: 36),
             
-            dropView.heightAnchor.constraint(equalToConstant: 36),
+            dropDownField.widthAnchor.constraint(equalToConstant: 140),
             
-            dropView.widthAnchor.constraint(equalToConstant: 120),
-            
-            dropView.topAnchor.constraint(equalTo: timeCollectionView.bottomAnchor, constant: 20)
-            
+            dropDownField.topAnchor.constraint(equalTo: timeCollectionView.bottomAnchor, constant: 20)
+        
         ])
-        
-    }
-    
-    func autoLayoutForDropIcon() {
-        
-        dropView.addSubview(dropDownIcon)
-        
-        NSLayoutConstraint.activate([
-            
-            dropDownIcon.trailingAnchor.constraint(equalTo: dropView.trailingAnchor, constant: -12),
-            
-            dropDownIcon.centerYAnchor.constraint(equalTo: dropView.centerYAnchor),
-            
-            dropDownIcon.heightAnchor.constraint(equalToConstant: 10),
-            
-            dropDownIcon.widthAnchor.constraint(equalToConstant: 12)
-            
-        ])
-        
-    }
-    
-    func autoLayoutForDropLabel() {
-        
-        dropView.addSubview(dropDownLabel)
-        
-        NSLayoutConstraint.activate([
-            
-            dropDownLabel.leadingAnchor.constraint(equalTo: dropView.leadingAnchor, constant: 12),
-            
-            dropDownLabel.centerYAnchor.constraint(equalTo: dropView.centerYAnchor),
-            
-        ])
-        
-    }
-    
-    func autoLayoutForDropDown() {
-        
-        incomeExpenseDropDown.anchorView = dropView
         
     }
     
@@ -637,7 +674,7 @@ extension StatisticVC {
         
         NSLayoutConstraint.activate([
             
-            lineChart.topAnchor.constraint(equalTo: dropView.bottomAnchor, constant: 32),
+            lineChart.topAnchor.constraint(equalTo: dropDownField.bottomAnchor, constant: 32),
             
             lineChart.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
             
@@ -690,22 +727,14 @@ extension StatisticVC {
     func setupUIAction() {
         
         // Add target here
-        
-        let dropGesture = UITapGestureRecognizer(target: self, action: #selector(dropViewTapped))
-        
-        dropGesture.numberOfTapsRequired = 1
-        
-        dropGesture.numberOfTouchesRequired = 1
-        
-        dropView.addGestureRecognizer(dropGesture)
-        
+                
     }
     
     // Objective function here
     
-    @objc func dropViewTapped() {
+    @objc func dropDropDone() {
         
-        incomeExpenseDropDown.show()
+        view.endEditing(true)
         
     }
     
@@ -784,7 +813,7 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-//        incomeExpenseDropDown.selectionAction = {(index: Int, item: String) in
+//        incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
 //
 //            switch index {
 //
@@ -801,10 +830,12 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
 //                return self.expense.count
 //            }
 //
+//            self.dropDownLabel.text = item
+//
 //        }
-        
-        return expense.count
-        
+    
+        return income.count
+                
     }
 
 
@@ -819,22 +850,26 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellTransaction", for: indexPath) as! CellTransactionItem
         
+        
+                
         incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
-         
+
             switch index {
-                
+
             case 0:
-                
+                                
                 cell.nameItem.text = expense[indexPath.row].name
 
                 cell.dateItem.text = expense[indexPath.row].date
 
                 cell.nameItem.textColor = MyColors.red.getColor()
-
+                
                 cell.amountTransaction.textColor = MyColors.red.getColor()
 
                 cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
                 
+                print(expense[indexPath.row].name)
+                                
             case 1:
                 
                 cell.nameItem.text = income[indexPath.row].name
@@ -846,21 +881,17 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
                 cell.amountTransaction.textColor = MyColors.lightGreen.getColor()
 
                 cell.amountTransaction.text = "+ Rs. \(income[indexPath.row].amount )"
-                
+
+                print(income[indexPath.row].name)
+
             default:
-                
-                cell.nameItem.text = expense[indexPath.row].name
 
-                cell.dateItem.text = expense[indexPath.row].date
+                break
 
-                cell.nameItem.textColor = MyColors.red.getColor()
-
-                cell.amountTransaction.textColor = MyColors.red.getColor()
-
-                cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
-                
             }
             
+//            dropDownLabel.text = item
+
         }
 
             cell.nameItem.text = expense[indexPath.row].name
@@ -873,6 +904,7 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
 
             cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
         
+        
         return cell
         
     }
@@ -880,6 +912,52 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
         return 60
+        
+    }
+    
+}
+
+extension UITextField {
+    
+    enum TextFieldImage {
+        
+        case left
+        
+        case right
+        
+    }
+    
+    func setupImage(imageName: String, on side: TextFieldImageSide) {
+        
+        let imageView = UIImageView(frame: CGRect(x: 4, y: 13 , width: 20, height: 10))
+        
+        if let imageWithSystemName = UIImage(systemName: imageName) {
+            
+            imageView.image = imageWithSystemName
+            
+        } else {
+            
+            imageView.image = UIImage(named: imageName)
+            
+        }
+        
+        let imageContainerView = UIView(frame: CGRect(x: 0, y: 0, width: 32, height: 36))
+        
+        imageContainerView.addSubview(imageView)
+        
+        switch side {
+            
+        case .left:
+            leftView = imageContainerView
+            
+            leftViewMode = .always
+            
+        case .right:
+            rightView = imageContainerView
+            
+            rightViewMode = .always
+            
+        }
         
     }
     

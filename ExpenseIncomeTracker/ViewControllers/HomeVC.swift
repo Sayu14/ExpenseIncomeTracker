@@ -444,8 +444,6 @@ class HomeVC: UIViewController {
 
         view.backgroundColor = .white
                 
-        getExpenseData()
-
         getPersonName()
 
         changeTimeLabel()
@@ -460,6 +458,8 @@ class HomeVC: UIViewController {
 
     // MARK: - View Will Appear
     override func viewWillAppear(_ animated: Bool) {
+        
+        getExpenseData()
 
     }
 
@@ -498,7 +498,7 @@ class HomeVC: UIViewController {
 
                 var expenseList = [Transaction]()
                 
-                var sum = [String]()
+                var sum = [Double]()
 
                 for document in querySnapshot!.documents {
 
@@ -536,16 +536,7 @@ class HomeVC: UIViewController {
 
                 self.modelTransactionData = expenseList
                 
-                let myStrings  = sum
-
-                let doubles  = myStrings.map { (s : String) -> Double in
-                  if let d = Double(s){
-                    return d
-                  }
-                  return 0.0
-                }
-
-                let total = doubles.reduce(0.0, {(sum: Double, item:Double) -> Double in
+                let total = sum.reduce(0.0, {(sum: Double, item:Double) -> Double in
                           return sum + item
                 })
                 
@@ -558,10 +549,10 @@ class HomeVC: UIViewController {
                     switch i.type {
                         
                     case TransactionType.income.rawValue:
-                        incomeAmt += Double(i.amount) ?? 0.0
+                        incomeAmt += i.amount
 
                     case TransactionType.expense.rawValue:
-                        expenseAmt += Double(i.amount) ?? 0.0
+                        expenseAmt += i.amount
 
                     default:
                         break
@@ -1040,6 +1031,14 @@ extension HomeVC {
     func setupUIAction() {
 
         // Add target here
+        
+        let seeAllGesture = UITapGestureRecognizer(target: self, action: #selector(seeAllTapped))
+        
+        seeAllGesture.numberOfTapsRequired = 1
+        
+        seeAllGesture.numberOfTouchesRequired = 1
+        
+        seeAll.addGestureRecognizer(seeAllGesture)
 
     }
 
@@ -1050,6 +1049,14 @@ extension HomeVC {
         transactionTable.reloadData()
         
         refreshControl.endRefreshing()
+        
+    }
+    
+    @objc func seeAllTapped() {
+        
+        let vc = ViewAllVC()
+        
+        self.navigationController?.pushViewController(vc, animated: true)
         
     }
 
@@ -1074,41 +1081,41 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-//        if modelTransactionData?.count == 0 {
-//            
-//            imgNoData.isHidden = false
-//            
-//            lblNoData.isHidden = false
-//
-//            return 0
-//            
-//        } else if modelTransactionData?.count == 1 {
-//            
-//            imgNoData.isHidden = true
-//            
-//            lblNoData.isHidden = true
-//
-//            return 1
-//            
-//        } else if modelTransactionData?.count == 2 {
-//            
-//            imgNoData.isHidden = true
-//            
-//            lblNoData.isHidden = true
-//
-//            return 2
-//            
-//        } else if modelTransactionData?.count ?? 0 > 3 {
-//            
-//            imgNoData.isHidden = true
-//            
-//            lblNoData.isHidden = true
-//
-//            return 3
-//            
-//        }
+        if modelTransactionData?.count == 0 {
+            
+            imgNoData.isHidden = false
+            
+            lblNoData.isHidden = false
 
-        return modelTransactionData?.count ?? 0
+            return 0
+            
+        } else if modelTransactionData?.count == 1 {
+            
+            imgNoData.isHidden = true
+            
+            lblNoData.isHidden = true
+
+            return 1
+            
+        } else if modelTransactionData?.count == 2 {
+            
+            imgNoData.isHidden = true
+            
+            lblNoData.isHidden = true
+
+            return 2
+            
+        } else if modelTransactionData?.count ?? 0 > 3 {
+            
+            imgNoData.isHidden = true
+            
+            lblNoData.isHidden = true
+
+            return 3
+            
+        }
+
+        return 0
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

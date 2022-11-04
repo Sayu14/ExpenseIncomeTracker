@@ -317,7 +317,7 @@ class ReportVC: UIViewController {
                 
                 var expenseList = [Transaction]()
                 
-                var sum = [String]()
+                var sum = [Double]()
                 
                 for document in querySnapshot!.documents {
                     
@@ -365,11 +365,11 @@ class ReportVC: UIViewController {
                         
                     case TransactionType.income.rawValue:
                         self.income.append(i)
-                        incomeAmt += Double(i.amount) ?? 0.0
-
+                        incomeAmt += i.amount
+                        
                     case TransactionType.expense.rawValue:
                         self.expense.append(i)
-                        expenseAmt += Double(i.amount) ?? 0.0
+                        expenseAmt += i.amount
 
                     default:
                         break
@@ -885,7 +885,7 @@ extension ReportVC: UITableViewDelegate, UITableViewDataSource {
                 
                 expense.remove(at: indexPath.row)
                             tableView.deleteRows(at: [indexPath], with: .fade)
-            
+                            
             case 1:
                 
                 let id = income[indexPath.row].id
@@ -908,14 +908,14 @@ extension ReportVC: UITableViewDelegate, UITableViewDataSource {
                 
                 income.remove(at: indexPath.row)
                             tableView.deleteRows(at: [indexPath], with: .fade)
-                
-                self.reportTable.reloadData()
-                
+                                
                 break
                 
             default:
                 break
             }
+            
+            getExpenseData()
             
         }
         
