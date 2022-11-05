@@ -109,7 +109,7 @@ class ViewAllVC: UIViewController {
 
                 var expenseList = [Transaction]()
                 
-                var sum = [Double]()
+                var sum = [Int]()
 
                 for document in querySnapshot!.documents {
 
@@ -248,7 +248,7 @@ extension ViewAllVC: UITableViewDelegate, UITableViewDataSource {
         
         vc.nameField.text = modelTransactionData?[indexPath.row].name
         
-        vc.amountField.text = "\(modelTransactionData?[indexPath.row].amount ?? 0.0)"
+        vc.amountField.text = "\(modelTransactionData?[indexPath.row].amount ?? 0)"
         
         vc.dateField.text = modelTransactionData?[indexPath.row].date
         

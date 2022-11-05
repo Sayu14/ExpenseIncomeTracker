@@ -12,7 +12,7 @@ struct Transaction: Codable {
     
     let date: String
     
-    let amount: Double
+    let amount: Int
     
     let name: String
     

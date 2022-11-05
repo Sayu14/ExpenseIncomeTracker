@@ -468,13 +468,7 @@ class EditDetailsVC: UIViewController, UITextFieldDelegate {
         
     }
     
-    func updateData(name: String, amount: String, date: String) {
-        
-        let name = nameField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+    func updateData(name: String, amount: Int, date: String) {
         
         let db = Firestore.firestore()
                 
@@ -492,7 +486,7 @@ class EditDetailsVC: UIViewController, UITextFieldDelegate {
                         
         let dbRef = db.collection("users").document(uid!).collection("transaction").document(idNumber)
         
-            dbRef.updateData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": typeOfTransaction, "id": idNumber]) { err in
+        dbRef.updateData(["name": name, "amount": amount, "date": date, "time": dateString, "type": typeOfTransaction, "id": idNumber]) { err in
             
             if let err = err {
                 
@@ -856,11 +850,13 @@ extension EditDetailsVC {
         
         let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         
+        let amountNumber = Int(amount ?? "")
+        
         let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
         
         if isValid() {
             
-            updateData(name: name ?? "", amount: amount ?? "", date: date ?? "")
+            updateData(name: name ?? "", amount: amountNumber ?? 0, date: date ?? "")
             
         }
         

@@ -516,13 +516,7 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
     }
     
-    func saveData(name: String, amount: String, date: String) {
-        
-        let name = nameField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
-        
-        let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
+    func saveData(name: String, amount: Int, date: String) {
         
         let db = Firestore.firestore()
         
@@ -544,7 +538,7 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
         let dbRef = db.collection("users").document(uid!).collection("transaction").document(randomNumber)
         
-            dbRef.setData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": transactionType.rawValue, "id": randomNumber]) { err in
+            dbRef.setData(["name": name, "amount": amount, "date": date, "time": dateString, "type": transactionType.rawValue, "id": randomNumber]) { err in
             
             if let err = err {
                 
@@ -568,7 +562,7 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
             
             let dbRef = db.collection("users").document(uid!).collection("transaction").document(randomNumber)
             
-            dbRef.setData(["name": name!, "amount": amount!, "date": date!, "time": dateString, "type": transactionType.rawValue, "id": randomNumber]) { err in
+            dbRef.setData(["name": name, "amount": amount, "date": date, "time": dateString, "type": transactionType.rawValue, "id": randomNumber]) { err in
                 
                 if let err = err {
                     
@@ -949,11 +943,13 @@ extension AddIncomeExpenseVC {
             
             let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
             
+            let amountNumber = Int(amount ?? "")
+            
             let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
             
             if isValid() {
                 
-                saveData(name: name ?? "", amount: amount ?? "", date: date ?? "")
+                saveData(name: name ?? "", amount: amountNumber ?? 0, date: date ?? "")
                 
             }
                         
@@ -963,11 +959,13 @@ extension AddIncomeExpenseVC {
             
             let amount = amountField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
             
+            let amountNumber = Int(amount ?? "")
+            
             let date = dateField.text?.trimmingCharacters(in: .whitespacesAndNewlines)
             
             if isValid() {
                 
-                saveData(name: name ?? "", amount: amount ?? "", date: date ?? "")
+                saveData(name: name ?? "", amount: amountNumber ?? 0, date: date ?? "")
                 
             }
             

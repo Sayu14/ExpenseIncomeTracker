@@ -445,7 +445,7 @@ class HomeVC: UIViewController {
         view.backgroundColor = .white
                 
         getPersonName()
-
+                
         changeTimeLabel()
 
         setupLayout()
@@ -460,7 +460,7 @@ class HomeVC: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         
         getExpenseData()
-
+        
     }
 
     // MARK: - View Will Disappear
@@ -469,10 +469,6 @@ class HomeVC: UIViewController {
     }
 
     // MARK: - Additional Functions
-
-    // Get person name from the Database
-
-    // Get the expense data of user
 
     func getExpenseData() {
 
@@ -498,7 +494,7 @@ class HomeVC: UIViewController {
 
                 var expenseList = [Transaction]()
                 
-                var sum = [Double]()
+                var sum = [Int]()
 
                 for document in querySnapshot!.documents {
 
@@ -536,13 +532,13 @@ class HomeVC: UIViewController {
 
                 self.modelTransactionData = expenseList
                 
-                let total = sum.reduce(0.0, {(sum: Double, item:Double) -> Double in
+                let total = sum.reduce(0, {(sum: Int, item: Int) -> Int in
                           return sum + item
                 })
                 
-                var incomeAmt = 0.0
+                var incomeAmt = 0
                 
-                var expenseAmt = 0.0
+                var expenseAmt = 0
                 
                 for i in expenseList {
                                             
@@ -1081,7 +1077,7 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 
-        if modelTransactionData?.count == 0 {
+        if modelTransactionData?.count ?? 0 == 0 {
             
             imgNoData.isHidden = false
             
@@ -1089,7 +1085,7 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
 
             return 0
             
-        } else if modelTransactionData?.count == 1 {
+        } else if modelTransactionData?.count ?? 0 == 1 {
             
             imgNoData.isHidden = true
             
@@ -1097,7 +1093,7 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
 
             return 1
             
-        } else if modelTransactionData?.count == 2 {
+        } else if modelTransactionData?.count ?? 0 == 2 {
             
             imgNoData.isHidden = true
             

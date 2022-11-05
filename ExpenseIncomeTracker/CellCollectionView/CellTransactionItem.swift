@@ -127,13 +127,13 @@ class CellTransactionItem: UITableViewCell {
             
             amountTransaction.textColor = MyColors.lightGreen.getColor()
             
-            amountTransaction.text = "+ Rs. \(data?.amount ?? 0.0)"
+            amountTransaction.text = "+ Rs. \(data?.amount ?? 0)"
             
         } else {
             
             amountTransaction.textColor = MyColors.red.getColor()
             
-            amountTransaction.text = "- Rs. \(data?.amount ?? 0.0)"
+            amountTransaction.text = "- Rs. \(data?.amount ?? 0)"
             
         }
         

@@ -14,9 +14,9 @@ import Firebase
 import LoadingView
 
 class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UIPickerViewDataSource, UITextFieldDelegate {
-
-    // MARK: - Initialization
     
+    // MARK: - Initialization
+        
     // Table view for Statistics details
     
     lazy var statisticsTable: UITableView = {
@@ -88,7 +88,7 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         x.drawGridLinesEnabled = false
         
         x.axisLineColor = MyColors.darkGreen.getColor()
-                
+        
         view.dragEnabled = false
         
         view.setScaleEnabled(false)
@@ -127,14 +127,14 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         
         amount.delegate = self
         
-        amount.text = "Select"
+        amount.text = "Expense"
         
         amount.keyboardType = .decimalPad
         
         amount.setupImage(imageName: "chevron.down", on: .right)
         
         amount.tintColor = .gray
-                        
+        
         amount.layer.cornerRadius = 10
         
         amount.layer.borderColor = MyColors.gray.getColor().cgColor
@@ -145,65 +145,6 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         
     }()
     
-    // Drop down icon
-//
-//    lazy var dropDownIcon: UIImageView = {
-//
-//        let img = UIImageView()
-//
-//        img.translatesAutoresizingMaskIntoConstraints = false
-//
-//        img.image = UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(pointSize: 4, weight: .bold))
-//
-//        img.tintColor = MyColors.gray.getColor()
-//
-//        img.contentMode = .scaleToFill
-//
-//        return img
-//
-//    }()
-//
-    // UI label in dropdown view
-//
-//    lazy var dropDownLabel: UILabel = {
-//
-//        let label = UILabel()
-//
-//        label.translatesAutoresizingMaskIntoConstraints = false
-//
-//        label.text = "Expense"
-//
-//        label.numberOfLines = 1
-//
-//        label.textColor = MyColors.gray.getColor()
-//
-//        label.font = UIFont(name: "Inter-Medium", size: 14)
-//
-//        return label
-//
-//    }()
-//
-    // UI View for drop down
-//
-//    lazy var dropView: UIView = {
-//
-//        let view = UIView()
-//
-//        view.translatesAutoresizingMaskIntoConstraints = false
-//
-//        view.layer.borderWidth = 1
-//
-//        view.backgroundColor = .white
-//
-//        view.layer.borderColor = MyColors.gray.getColor().cgColor
-//
-//        view.layer.cornerRadius = 10
-//
-//        return view
-//
-//    }()
-    
-    // Drop Down
     
     lazy var incomeExpenseDropDown: DropDown = {
         
@@ -290,22 +231,24 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
     
     var selectedItem: IndexPath = IndexPath(item: 0, section: 0)
     
-    var dataEntriesChart = [ChartDataEntry]()
+//    var dataEntriesChart = [ChartDataEntry]()
     
-    var xPosition = ["0.2", "0.4", "0.6", "0.8", "1"]
-    
-    var yPosition = ["1", "0.5", "0.7", "1", "0.4"]
+    weak var axisFormatDelegate: AxisValueFormatter?
     
     var income = [Transaction]()
     
     var expense = [Transaction]()
-        
-    var modelTransaction: [Transaction]?
+    
+    var modelTransaction = [Transaction]()
     
     var randomArr = [1, 3, 4, 10, 5, 9, 2]
     
-    var dropDownList = ["Select","Expense", "Income"]
+    var dropDownList = ["Expense", "Income"]
+    
+    var isExpenseSelected = true
         
+    var months = [String]()
+    
     // MARK: - View Did Load
     
     override func viewDidLoad() {
@@ -315,17 +258,15 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         view.backgroundColor = .white
         
         timeCollectionView.register(CellStatisticTimePeriod.self, forCellWithReuseIdentifier: "cellStatisticTime")
-                
+        
         getData()
         
-        lineChartDataEntry()
-        
-//        let incomeTop = income.sorted(by: {$0.amount > $1.amount})
-//
-//        print("top to bottom is \(incomeTop)")
+        axisFormatDelegate = self
+                
+        print(randomArr.sorted(by: {$0 > $1}))
         
         createPickerView()
-                        
+        
         setupLayout()
         
         setupUIAction()
@@ -348,32 +289,78 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
     
     func lineChartDataEntry() {
         
-        for x in 0..<5 {
-
-            dataEntriesChart.append(ChartDataEntry(x: Double(x), y: Double.random(in: 0...5)))
-
-        }
-
-        let set = LineChartDataSet(dataEntriesChart)
-
-        set.mode = .cubicBezier
-
-        set.colors = ChartColorTemplates.material()
-
-        let gradientColors = [MyColors.darkGreen.getColor().cgColor, UIColor.clear.cgColor] as CFArray
-
-        let colorLocations:[CGFloat] = [0.2, 0.0] // Positioning of the gradient
-
-        let gradient = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations)
-
-        set.fill = LinearGradientFill(gradient: gradient!, angle: 90)
-
-        set.drawFilledEnabled = true
-
-        let data = LineChartData(dataSet: set)
-
-        lineChart.data = data
+        //        for x in 0..<5 {
+        //
+        //            dataEntriesChart.append(ChartDataEntry(x: Double(x), y: Double.random(in: 0...5)))
+        //
+        //        }
+        var values = [BarChartDataEntry]()
         
+        for i in modelTransaction {
+            
+            self.months.append(Utilities.getMonthAndDay(date: i.date))
+            
+        }
+        
+        for i in 0..<modelTransaction.count {
+            
+            let xValue = Double(i)
+            
+            let yValue = Double(modelTransaction[i].amount)
+            
+            let dataEntry = BarChartDataEntry(x: xValue, y: yValue, data: modelTransaction[i].date as AnyObject?)
+            
+            values.append(dataEntry)
+        }
+        
+        let x = self.lineChart.xAxis
+        x.labelCount = modelTransaction.count
+        x.spaceMax = 0.5
+        x.spaceMin = 0.5
+        
+        let set1 = LineChartDataSet(entries: values, label: "DataSet 1")
+        set1.mode = .cubicBezier
+        set1.cubicIntensity = 0.2
+        set1.cubicIntensity = 0.2
+        set1.drawFilledEnabled = true
+        set1.drawCirclesEnabled = true
+        set1.lineWidth = 2
+        set1.circleRadius = 3
+        set1.setCircleColor(MyColors.darkGreen.getColor())
+        set1.circleHoleColor = MyColors.green.getColor()
+        set1.colors = [MyColors.green.getColor()]
+        set1.fillColor = MyColors.green.getColor().withAlphaComponent(0.4)
+        set1.valueTextColor = MyColors.lightGreen.getColor()
+        set1.drawValuesEnabled = false
+        set1.drawVerticalHighlightIndicatorEnabled = false
+        set1.drawHorizontalHighlightIndicatorEnabled = false
+        set1.label = "Credit usage in the past 3 months."
+        let data = LineChartData(dataSet: set1)
+        data.setDrawValues(false)
+        lineChart.data = data
+        let xAxisValue = lineChart.xAxis
+        xAxisValue.valueFormatter = axisFormatDelegate
+//
+//        let set = LineChartDataSet(dataEntriesChart)
+//
+//        set.mode = .cubicBezier
+//
+//        set.colors = ChartColorTemplates.material()
+//
+//        let gradientColors = [MyColors.darkGreen.getColor().cgColor, UIColor.clear.cgColor] as CFArray
+//
+//        let colorLocations:[CGFloat] = [0.2, 0.0] // Positioning of the gradient
+//
+//        let gradient = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations)
+//
+//        set.fill = LinearGradientFill(gradient: gradient!, angle: 90)
+//
+//        set.drawFilledEnabled = true
+//
+//        let data = LineChartData(dataSet: set)
+//
+//        lineChart.data = data
+//
     }
     
     func getData() {
@@ -397,7 +384,7 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
             } else {
                 
                 var expenseList = [Transaction]()
-                                
+                
                 for document in querySnapshot!.documents {
                     
                     print("\(document.documentID) => \(document.data())")
@@ -415,7 +402,7 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
                             let decoded = try decoder.decode(Transaction.self, from: jsonData)
                             
                             expenseList.append(decoded)
-                                                        
+                            
                         } catch {
                             
                             print("Failed to decode JSON")
@@ -431,26 +418,38 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
                 }
                 
                 self.modelTransaction = expenseList
-
+                
                 
                 for i in expenseList {
-                                            
+                    
                     switch i.type {
                         
                     case TransactionType.income.rawValue:
                         self.income.append(i)
-
+                        
                     case TransactionType.expense.rawValue:
                         self.expense.append(i)
-
+                        
                     default:
                         break
                         
                     }
-                                            
+                    
                 }
-                                
-                self.statisticsTable.reloadData()
+                
+                let dateFormatter = DateFormatter()
+                
+                dateFormatter.dateFormat = "MM dd, yyyy"// yyyy-MM-dd"
+
+                modelTransaction = modelTransaction.sorted(by: { dateFormatter.date(from:$0.date )!.compare(dateFormatter.date(from:$1.date)!) == .orderedAscending })
+                
+                expense = expense.sorted(by: {$0.amount > $1.amount})
+                
+                income = income.sorted(by: {$0.amount > $1.amount})
+                
+                lineChartDataEntry()
+                
+                statisticsTable.reloadData()
                 
             }
             
@@ -460,54 +459,66 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
     
     func createPickerView() {
         
-           let pickerView = UIPickerView()
+        let pickerView = UIPickerView()
         
-           pickerView.delegate = self
+        pickerView.delegate = self
         
-           dropDownField.inputView = pickerView
+        dropDownField.inputView = pickerView
         
     }
     
     func dismissPickerView() {
         
-       let toolBar = UIToolbar()
+        let toolBar = UIToolbar()
         
-       toolBar.sizeToFit()
+        toolBar.sizeToFit()
         
         let button = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(dropDropDone))
         
-       toolBar.setItems([button], animated: true)
+        toolBar.setItems([button], animated: true)
         
-       toolBar.isUserInteractionEnabled = true
+        toolBar.isUserInteractionEnabled = true
         
-       dropDownField.inputAccessoryView = toolBar
+        dropDownField.inputAccessoryView = toolBar
         
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-
+        
         return 1
-
+        
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-
+        
         return dropDownList.count
-
+        
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-
+        
         return dropDownList[row]
-
+        
     }
-
+    
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-
+        
         let selectedDrop = dropDownList[row]
         
+        if row == 1 {
+            
+            isExpenseSelected = false
+            
+        } else {
+            
+            isExpenseSelected = true
+            
+        }
+        
+        statisticsTable.reloadData()
+        
         dropDownField.text = selectedDrop
-
+        
     }
     
 }
@@ -519,18 +530,10 @@ extension StatisticVC {
     func setupLayout() {
         
         autoLayoutForTitle()
-                
+        
         autoLayoutForDownloadBtn()
         
         autoLayoutForTimeCollectionView()
-//
-//        autoLayoutForDropView()
-//
-//        autoLayoutForDropDown()
-//
-//        autoLayoutForDropLabel()
-//
-//        autoLayoutForDropIcon()
         
         autoLayoutForDropDownField()
         
@@ -539,7 +542,7 @@ extension StatisticVC {
         autoLayoutForLblTopSpending()
         
         autoLayoutForStatisticsTable()
-                
+        
     }
     
     // MARK: - Autolayout
@@ -594,68 +597,12 @@ extension StatisticVC {
         
     }
     
-//    func autoLayoutForDropView() {
-//
-//        view.addSubview(dropView)
-//
-//        NSLayoutConstraint.activate([
-//
-//            dropView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-//
-//            dropView.heightAnchor.constraint(equalToConstant: 36),
-//
-//            dropView.widthAnchor.constraint(equalToConstant: 120),
-//
-//            dropView.topAnchor.constraint(equalTo: timeCollectionView.bottomAnchor, constant: 20)
-//
-//        ])
-//
-//    }
-//
-//    func autoLayoutForDropIcon() {
-//
-//        dropView.addSubview(dropDownIcon)
-//
-//        NSLayoutConstraint.activate([
-//
-//            dropDownIcon.trailingAnchor.constraint(equalTo: dropView.trailingAnchor, constant: -12),
-//
-//            dropDownIcon.centerYAnchor.constraint(equalTo: dropView.centerYAnchor),
-//
-//            dropDownIcon.heightAnchor.constraint(equalToConstant: 10),
-//
-//            dropDownIcon.widthAnchor.constraint(equalToConstant: 12)
-//
-//        ])
-//
-//    }
-//
-//    func autoLayoutForDropLabel() {
-//
-//        dropView.addSubview(dropDownLabel)
-//
-//        NSLayoutConstraint.activate([
-//
-//            dropDownLabel.leadingAnchor.constraint(equalTo: dropView.leadingAnchor, constant: 12),
-//
-//            dropDownLabel.centerYAnchor.constraint(equalTo: dropView.centerYAnchor),
-//
-//        ])
-//
-//    }
-    
-//    func autoLayoutForDropDown() {
-//
-//        incomeExpenseDropDown.anchorView = dropView
-//
-//    }
-    
     func autoLayoutForDropDownField() {
         
         view.addSubview(dropDownField)
         
         NSLayoutConstraint.activate([
-        
+            
             dropDownField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
             
             dropDownField.heightAnchor.constraint(equalToConstant: 36),
@@ -663,7 +610,7 @@ extension StatisticVC {
             dropDownField.widthAnchor.constraint(equalToConstant: 140),
             
             dropDownField.topAnchor.constraint(equalTo: timeCollectionView.bottomAnchor, constant: 20)
-        
+            
         ])
         
     }
@@ -691,11 +638,11 @@ extension StatisticVC {
         view.addSubview(lblTopSpending)
         
         NSLayoutConstraint.activate([
-        
+            
             lblTopSpending.topAnchor.constraint(equalTo: lineChart.bottomAnchor, constant: 32),
             
             lblTopSpending.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20)
-        
+            
         ])
         
     }
@@ -705,7 +652,7 @@ extension StatisticVC {
         view.addSubview(statisticsTable)
         
         NSLayoutConstraint.activate([
-        
+            
             statisticsTable.leadingAnchor.constraint(equalTo: lblTopSpending.leadingAnchor),
             
             statisticsTable.topAnchor.constraint(equalTo: lblTopSpending.bottomAnchor, constant: 20),
@@ -713,7 +660,7 @@ extension StatisticVC {
             statisticsTable.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
             
             statisticsTable.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -60)
-        
+            
         ])
         
     }
@@ -727,7 +674,7 @@ extension StatisticVC {
     func setupUIAction() {
         
         // Add target here
-                
+        
     }
     
     // Objective function here
@@ -813,32 +760,40 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-//        incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
-//
-//            switch index {
-//
-//            case 0:
-//
-//                return self.expense.count
-//
-//            case 1:
-//
-//                return self.income.count
-//
-//            default:
-//
-//                return self.expense.count
-//            }
-//
-//            self.dropDownLabel.text = item
-//
-//        }
-    
-        return income.count
-                
+        //        incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
+        //
+        //            switch index {
+        //
+        //            case 0:
+        //
+        //                return self.expense.count
+        //
+        //            case 1:
+        //
+        //                return self.income.count
+        //
+        //            default:
+        //
+        //                return self.expense.count
+        //            }
+        //
+        //            self.dropDownLabel.text = item
+        //
+        //        }
+        
+        if isExpenseSelected {
+            
+            return expense.count
+            
+        } else {
+            
+            return income.count
+            
+        }
+        
     }
-
-
+    
+    
     
     func numberOfSections(in tableView: UITableView) -> Int {
         
@@ -850,59 +805,82 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellTransaction", for: indexPath) as! CellTransactionItem
         
-        
-                
-        incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
-
-            switch index {
-
-            case 0:
-                                
-                cell.nameItem.text = expense[indexPath.row].name
-
-                cell.dateItem.text = expense[indexPath.row].date
-
-                cell.nameItem.textColor = MyColors.red.getColor()
-                
-                cell.amountTransaction.textColor = MyColors.red.getColor()
-
-                cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
-                
-                print(expense[indexPath.row].name)
-                                
-            case 1:
-                
-                cell.nameItem.text = income[indexPath.row].name
-
-                cell.dateItem.text = income[indexPath.row].date
-
-                cell.nameItem.textColor = MyColors.green.getColor()
-
-                cell.amountTransaction.textColor = MyColors.lightGreen.getColor()
-
-                cell.amountTransaction.text = "+ Rs. \(income[indexPath.row].amount )"
-
-                print(income[indexPath.row].name)
-
-            default:
-
-                break
-
-            }
+        if isExpenseSelected == true {
             
-//            dropDownLabel.text = item
-
-        }
-
             cell.nameItem.text = expense[indexPath.row].name
-
+            
             cell.dateItem.text = expense[indexPath.row].date
-
+            
             cell.nameItem.textColor = MyColors.red.getColor()
-
+            
             cell.amountTransaction.textColor = MyColors.red.getColor()
-
+            
             cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
+            
+        } else {
+            
+            cell.nameItem.text = income[indexPath.row].name
+            
+            cell.dateItem.text = income[indexPath.row].date
+            
+            cell.nameItem.textColor = MyColors.green.getColor()
+            
+            cell.amountTransaction.textColor = MyColors.lightGreen.getColor()
+            
+            cell.amountTransaction.text = "+ Rs. \(income[indexPath.row].amount )"
+            
+        }
+        
+        
+        //        incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
+        //
+        //            switch index {
+        //
+        //            case 0:
+        //
+        //                cell.nameItem.text = expense[indexPath.row].name
+        //
+        //                cell.dateItem.text = expense[indexPath.row].date
+        //
+        //                cell.nameItem.textColor = MyColors.red.getColor()
+        //
+        //                cell.amountTransaction.textColor = MyColors.red.getColor()
+        //
+        //                cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
+        //
+        //                print(expense[indexPath.row].name)
+        //
+        //            case 1:
+        //
+        //                cell.nameItem.text = income[indexPath.row].name
+        //
+        //                cell.dateItem.text = income[indexPath.row].date
+        //
+        //                cell.nameItem.textColor = MyColors.green.getColor()
+        //
+        //                cell.amountTransaction.textColor = MyColors.lightGreen.getColor()
+        //
+        //                cell.amountTransaction.text = "+ Rs. \(income[indexPath.row].amount )"
+        //
+        //                print(income[indexPath.row].name)
+        //
+        //            default:
+        //
+        //                break
+        //
+        //            }
+        //
+        //        }
+        //
+        //            cell.nameItem.text = expense[indexPath.row].name
+        //
+        //            cell.dateItem.text = expense[indexPath.row].date
+        //
+        //            cell.nameItem.textColor = MyColors.red.getColor()
+        //
+        //            cell.amountTransaction.textColor = MyColors.red.getColor()
+        //
+        //            cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
         
         
         return cell
@@ -961,4 +939,12 @@ extension UITextField {
         
     }
     
+}
+
+extension StatisticVC: AxisValueFormatter {
+    
+  func stringForValue(_ value: Double, axis: AxisBase?) -> String {
+      
+    return months[Int(value)]
+  }
 }

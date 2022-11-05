@@ -10,6 +10,7 @@ import MinimalToast
 import FirebaseAuth
 import Firebase
 import GoogleSignIn
+import LoadingView
 
 class LoginVC: UIViewController, UITextFieldDelegate {
 
@@ -195,10 +196,6 @@ class LoginVC: UIViewController, UITextFieldDelegate {
 
         password.addPadding(padding: .right(12))
 
-        //        email.rightViewMode = .whileEditing
-
-        //        email.setUpImage(imageName: "cleartext", on: .right)
-
         password.tintColor = .gray
 
         password.returnKeyType = .done
@@ -297,11 +294,17 @@ class LoginVC: UIViewController, UITextFieldDelegate {
 
     // Main View
 
-    lazy var mainView: UIView = {
+    lazy var mainView: LoadingView = {
 
-        let view = UIView()
+        let view = LoadingView()
 
         view.translatesAutoresizingMaskIntoConstraints = false
+        
+        view.dotOneColor = MyColors.darkGreen.getColor()
+        
+        view.dotTwoColor = MyColors.lightGreen.getColor()
+        
+        view.dotThreeColor = MyColors.green.getColor()
 
         view.backgroundColor = .white
 
@@ -744,8 +747,6 @@ extension LoginVC {
         mainView.addSubview(googleSignInBtn)
 
         NSLayoutConstraint.activate([
-
-//            googleSignInBtn.trailingAnchor.constraint(equalTo: centerView.leadingAnchor, constant: -20),
             
             googleSignInBtn.centerXAnchor.constraint(equalTo: centerView.centerXAnchor),
 
@@ -758,24 +759,6 @@ extension LoginVC {
             ])
 
     }
-//
-//    func autoLayoutForFacebookSignInBtn() {
-//
-//        mainView.addSubview(facebookSignInBtn)
-//
-//        NSLayoutConstraint.activate([
-//
-//            facebookSignInBtn.leadingAnchor.constraint(equalTo: centerView.leadingAnchor, constant: 20),
-//
-//            facebookSignInBtn.topAnchor.constraint(equalTo: orLabel.bottomAnchor, constant: 24),
-//
-//            facebookSignInBtn.heightAnchor.constraint(equalToConstant: 50),
-//
-//            facebookSignInBtn.widthAnchor.constraint(equalToConstant: 50)
-//
-//            ])
-//
-//    }
 
 }
 
@@ -810,7 +793,11 @@ extension LoginVC {
     }
 
     @objc func loginBtnTapped() {
-
+        
+        mainView.startLoading(type: .dots)
+        
+        loginBtn.isUserInteractionEnabled = false
+        
         let error = validateFields()
 
         if error != nil {
@@ -828,6 +815,10 @@ extension LoginVC {
             let password = passwordField.text!.trimmingCharacters(in: .whitespacesAndNewlines)
 
             Auth.auth().signIn(withEmail: email, password: password) { result, error in
+                
+                self.loginBtn.isUserInteractionEnabled = true
+                
+                self.mainView.stopLoading()
 
                 if error != nil {
 
@@ -876,8 +867,11 @@ extension LoginVC {
 extension LoginVC {
 
     func showMessagePrompt(_ message: String) {
+        
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
+        
         let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        
         alert.addAction(okAction)
         present(alert, animated: false, completion: nil)
     }

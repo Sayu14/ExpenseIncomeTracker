@@ -11,9 +11,9 @@ import FirebaseFirestore
 import Firebase
 import LoadingView
 
-var TOTAL_INCOME = 0.0
+var TOTAL_INCOME = 0
 
-var TOTAL_EXPENSE = 0.0
+var TOTAL_EXPENSE = 0
 
 class ReportVC: UIViewController {
     
@@ -317,7 +317,7 @@ class ReportVC: UIViewController {
                 
                 var expenseList = [Transaction]()
                 
-                var sum = [Double]()
+                var sum = [Int]()
                 
                 for document in querySnapshot!.documents {
                     
@@ -355,9 +355,9 @@ class ReportVC: UIViewController {
                 
                 self.modelTransaction = expenseList
                 
-                var incomeAmt = 0.0
+                var incomeAmt = 0
                 
-                var expenseAmt = 0.0
+                var expenseAmt = 0
                 
                 for i in expenseList {
                                             

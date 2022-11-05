@@ -5,8 +5,9 @@
 //  Created by Sayujya Singh on 25/10/2022.
 //
 
-import SwiftUI
+import Foundation
 import MinimalToast
+import UIKit
 
 class Utilities{
     
@@ -17,6 +18,24 @@ class Utilities{
         return passwordTest.evaluate(with: password)
         
     }
+    
+    class func getMonthAndDay(date: String) -> (String) {
+    
+        let dateFormatterGet = DateFormatter()
+        
+        dateFormatterGet.dateFormat = "MM dd, yyyy"
+        
+        let dateFormatterPrint = DateFormatter()
+        
+        dateFormatterPrint.dateFormat = "MMM d"
+        
+        let printDate: Date? = dateFormatterGet.date(from: date)
+        
+        print("DATTTEEE = \(dateFormatterPrint.string(from: printDate ?? Date()))")
+        
+        return (dateFormatterPrint.string(from: printDate ?? Date()))
+        
+      }
     
 }
 
@@ -29,6 +48,8 @@ enum MyColors{
     case greenText
     
     case darkGreen
+    
+    case darkestGreen
     
     case red
     
@@ -59,6 +80,9 @@ enum MyColors{
             
         case .darkGreen:
             return UIColor(hexString: "#008079")
+            
+        case .darkestGreen:
+            return UIColor(hexString: "#00412C")
             
         case .red:
             return UIColor(hexString: "#FF4A47")

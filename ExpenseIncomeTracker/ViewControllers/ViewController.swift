@@ -74,7 +74,9 @@ class ViewController: UIViewController {
                 
         btn.setTitle("Get Started", for: .normal)
         
-        btn.titleLabel?.font = UIFont(name: "Inter-Regular", size: 18)
+        btn.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
+        
+//        btn.titleLabel?.font = UIFont(name: "Inter-Regular", size: 18)
         
         return btn
         
@@ -124,7 +126,7 @@ class ViewController: UIViewController {
         
         img.translatesAutoresizingMaskIntoConstraints = false
         
-        img.image = UIImage(named: "man")
+        img.image = UIImage(named: "specular")
         
         img.contentMode = .scaleToFill
         
@@ -371,7 +373,7 @@ extension ViewController {
     
     @objc func loginAction() {
         
-        let vc = LoginVC()
+        let vc = Login2VC()
         
         self.navigationController?.pushViewController(vc, animated: true)
         
