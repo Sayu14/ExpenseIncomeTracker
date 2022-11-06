@@ -23,8 +23,8 @@ class CellTransactionItem: UITableViewCell {
         label.text = "- $ 850.00"
         
         label.textColor = MyColors.red.getColor()
-        
-        label.font = UIFont(name: "Inter-Bold", size: 18)
+                
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
         
         return label
         
@@ -44,8 +44,8 @@ class CellTransactionItem: UITableViewCell {
         label.numberOfLines = 1
         
         label.textColor = MyColors.gray.getColor()
-        
-        label.font = UIFont(name: "Inter-Regular", size: 13)
+                
+        label.font = .systemFont(ofSize: 14, weight: .regular)
         
         return label
         
@@ -125,7 +125,7 @@ class CellTransactionItem: UITableViewCell {
         
         if data?.type == TransactionType.income.rawValue {
             
-            amountTransaction.textColor = MyColors.lightGreen.getColor()
+            amountTransaction.textColor = MyColors.greenText.getColor()
             
             amountTransaction.text = "+ Rs. \(data?.amount ?? 0)"
             
@@ -165,10 +165,6 @@ extension CellTransactionItem {
         NSLayoutConstraint.activate([
         
             viewImg.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            
-//            viewImg.topAnchor.constraint(equalTo: contentView.topAnchor),
-//
-//            viewImg.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
             viewImg.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             
@@ -220,7 +216,7 @@ extension CellTransactionItem {
         
             dateItem.leadingAnchor.constraint(equalTo: nameItem.leadingAnchor),
             
-            dateItem.bottomAnchor.constraint(equalTo: viewImg.bottomAnchor, constant: -2)
+            dateItem.bottomAnchor.constraint(equalTo: viewImg.bottomAnchor, constant: -4)
             
         ])
         

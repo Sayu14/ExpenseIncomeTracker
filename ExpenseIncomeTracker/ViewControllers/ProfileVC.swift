@@ -23,8 +23,8 @@ class ProfileVC: UIViewController {
         btn.translatesAutoresizingMaskIntoConstraints = false
         
         btn.setTitle("Logout", for: .normal)
-        
-        btn.titleLabel?.font = UIFont(name: "Inter-SemiBold", size: 18)
+                
+        btn.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
         
         btn.backgroundColor = MyColors.green.getColor()
         
@@ -59,8 +59,8 @@ class ProfileVC: UIViewController {
         label.textAlignment = .center
         
         label.textColor = .black
-        
-        label.font = UIFont(name: "Inter-Medium", size: 16)
+                
+        label.font = .systemFont(ofSize: 16, weight: .medium)
         
         return label
         
@@ -98,8 +98,8 @@ class ProfileVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -148,10 +148,10 @@ class ProfileVC: UIViewController {
         
         label.textAlignment = .center
         
-        label.textColor = MyColors.greenText.getColor()
+        label.textColor = MyColors.green.getColor()
         
-        label.font = UIFont(name: "Inter-SemiBold", size: 14)
-        
+        label.font = .systemFont(ofSize: 14, weight: .semibold)
+
         return label
         
     }()
@@ -172,8 +172,8 @@ class ProfileVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-SemiBold", size: 20)
-        
+        label.font = .systemFont(ofSize: 20, weight: .semibold)
+
         return label
         
     }()
@@ -235,8 +235,8 @@ class ProfileVC: UIViewController {
         label.numberOfLines = 1
         
         label.textColor = .white
-        
-        label.font = UIFont(name: "Inter-SemiBold", size: 18)
+                
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
         
         return label
         

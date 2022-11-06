@@ -25,8 +25,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -45,8 +45,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -79,8 +79,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -99,8 +99,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -119,8 +119,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -139,8 +139,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -173,8 +173,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -193,8 +193,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -213,8 +213,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -233,8 +233,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.green.getColor()
         
-        label.font = UIFont(name: "Inter-SemiBold", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .semibold)
+
         return label
         
     }()
@@ -253,8 +253,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -273,8 +273,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -293,8 +293,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -313,8 +313,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 16)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -333,8 +333,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Medium", size: 18)
-        
+        label.font = .systemFont(ofSize: 16, weight: .medium)
+
         return label
         
     }()
@@ -353,8 +353,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-SemiBold", size: 24)
-        
+        label.font = .systemFont(ofSize: 24, weight: .semibold)
+
         return label
         
     }()
@@ -373,8 +373,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = MyColors.green.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 14)
-        
+        label.font = .systemFont(ofSize: 14, weight: .medium)
+
         return label
         
     }()
@@ -463,8 +463,8 @@ class TransactionDetailsVC: UIViewController {
         
         label.textColor = .white
         
-        label.font = UIFont(name: "Inter-SemiBold", size: 18)
-        
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
+
         return label
         
     }()

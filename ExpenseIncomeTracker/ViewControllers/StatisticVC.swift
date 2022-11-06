@@ -56,8 +56,8 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         label.numberOfLines = 1
         
         label.textColor = .black
-        
-        label.font = UIFont(name: "Inter-SemiBold", size: 18)
+                
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
         
         return label
         
@@ -117,8 +117,8 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         
         amount.textColor = MyColors.gray.getColor()
         
-        amount.font = UIFont(name: "Inter-Medium", size: 14)
-        
+        amount.font = .systemFont(ofSize: 14, weight: .medium)
+
         amount.borderStyle = .none
         
         amount.addPadding(padding: .left(12))
@@ -142,22 +142,6 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         amount.layer.borderWidth = 1
         
         return amount
-        
-    }()
-    
-    
-    lazy var incomeExpenseDropDown: DropDown = {
-        
-        let drop = DropDown()
-        
-        drop.dataSource = [
-            "Expense",
-            "Income"
-        ]
-        
-        drop.selectRow(at: 0)
-        
-        return drop
         
     }()
     
@@ -218,8 +202,8 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         label.numberOfLines = 1
         
         label.textColor = .black
-        
-        label.font = UIFont(name: "Inter-SemiBold", size: 18)
+                
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
         
         return label
         
@@ -240,9 +224,7 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
     var expense = [Transaction]()
     
     var modelTransaction = [Transaction]()
-    
-    var randomArr = [1, 3, 4, 10, 5, 9, 2]
-    
+        
     var dropDownList = ["Expense", "Income"]
     
     var isExpenseSelected = true
@@ -259,14 +241,10 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         
         timeCollectionView.register(CellStatisticTimePeriod.self, forCellWithReuseIdentifier: "cellStatisticTime")
         
-        getData()
-        
         axisFormatDelegate = self
-                
-        print(randomArr.sorted(by: {$0 > $1}))
-        
+                                
         createPickerView()
-        
+                
         setupLayout()
         
         setupUIAction()
@@ -278,6 +256,12 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
     // MARK: - View Will Appear
     override func viewWillAppear(_ animated: Bool) {
         
+        expense.removeAll()
+        
+        income.removeAll()
+        
+        getData()
+                
     }
     
     // MARK: - View Will Disappear
@@ -288,12 +272,7 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
     // MARK: - Additional Functions
     
     func lineChartDataEntry() {
-        
-        //        for x in 0..<5 {
-        //
-        //            dataEntriesChart.append(ChartDataEntry(x: Double(x), y: Double.random(in: 0...5)))
-        //
-        //        }
+
         var values = [BarChartDataEntry]()
         
         for i in modelTransaction {
@@ -311,56 +290,61 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
             let dataEntry = BarChartDataEntry(x: xValue, y: yValue, data: modelTransaction[i].date as AnyObject?)
             
             values.append(dataEntry)
+            
         }
         
         let x = self.lineChart.xAxis
+        
         x.labelCount = modelTransaction.count
+        
         x.spaceMax = 0.5
+        
         x.spaceMin = 0.5
         
         let set1 = LineChartDataSet(entries: values, label: "DataSet 1")
+        
         set1.mode = .cubicBezier
+        
         set1.cubicIntensity = 0.2
+        
         set1.cubicIntensity = 0.2
+        
         set1.drawFilledEnabled = true
+        
         set1.drawCirclesEnabled = true
+        
         set1.lineWidth = 2
+        
         set1.circleRadius = 3
+        
         set1.setCircleColor(MyColors.darkGreen.getColor())
+        
         set1.circleHoleColor = MyColors.green.getColor()
+        
         set1.colors = [MyColors.green.getColor()]
+        
         set1.fillColor = MyColors.green.getColor().withAlphaComponent(0.4)
+        
         set1.valueTextColor = MyColors.lightGreen.getColor()
+        
         set1.drawValuesEnabled = false
+        
         set1.drawVerticalHighlightIndicatorEnabled = false
+        
         set1.drawHorizontalHighlightIndicatorEnabled = false
+        
         set1.label = "Credit usage in the past 3 months."
+        
         let data = LineChartData(dataSet: set1)
+        
         data.setDrawValues(false)
+        
         lineChart.data = data
+        
         let xAxisValue = lineChart.xAxis
+        
         xAxisValue.valueFormatter = axisFormatDelegate
-//
-//        let set = LineChartDataSet(dataEntriesChart)
-//
-//        set.mode = .cubicBezier
-//
-//        set.colors = ChartColorTemplates.material()
-//
-//        let gradientColors = [MyColors.darkGreen.getColor().cgColor, UIColor.clear.cgColor] as CFArray
-//
-//        let colorLocations:[CGFloat] = [0.2, 0.0] // Positioning of the gradient
-//
-//        let gradient = CGGradient.init(colorsSpace: CGColorSpaceCreateDeviceRGB(), colors: gradientColors, locations: colorLocations)
-//
-//        set.fill = LinearGradientFill(gradient: gradient!, angle: 90)
-//
-//        set.drawFilledEnabled = true
-//
-//        let data = LineChartData(dataSet: set)
-//
-//        lineChart.data = data
-//
+
     }
     
     func getData() {
@@ -437,9 +421,11 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
                     
                 }
                 
+                // Date formatting for line chart
+                
                 let dateFormatter = DateFormatter()
                 
-                dateFormatter.dateFormat = "MM dd, yyyy"// yyyy-MM-dd"
+                dateFormatter.dateFormat = "MM dd, yyyy"
 
                 modelTransaction = modelTransaction.sorted(by: { dateFormatter.date(from:$0.date )!.compare(dateFormatter.date(from:$1.date)!) == .orderedAscending })
                 
@@ -508,6 +494,8 @@ class StatisticVC: UIViewController, ChartViewDelegate, UIPickerViewDelegate, UI
         if row == 1 {
             
             isExpenseSelected = false
+            
+            lblTopSpending.text = "Top Earning"
             
         } else {
             
@@ -760,27 +748,6 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        //        incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
-        //
-        //            switch index {
-        //
-        //            case 0:
-        //
-        //                return self.expense.count
-        //
-        //            case 1:
-        //
-        //                return self.income.count
-        //
-        //            default:
-        //
-        //                return self.expense.count
-        //            }
-        //
-        //            self.dropDownLabel.text = item
-        //
-        //        }
-        
         if isExpenseSelected {
             
             return expense.count
@@ -830,58 +797,6 @@ extension StatisticVC: UITableViewDelegate, UITableViewDataSource {
             cell.amountTransaction.text = "+ Rs. \(income[indexPath.row].amount )"
             
         }
-        
-        
-        //        incomeExpenseDropDown.selectionAction = { [unowned self] (index: Int, item: String) in
-        //
-        //            switch index {
-        //
-        //            case 0:
-        //
-        //                cell.nameItem.text = expense[indexPath.row].name
-        //
-        //                cell.dateItem.text = expense[indexPath.row].date
-        //
-        //                cell.nameItem.textColor = MyColors.red.getColor()
-        //
-        //                cell.amountTransaction.textColor = MyColors.red.getColor()
-        //
-        //                cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
-        //
-        //                print(expense[indexPath.row].name)
-        //
-        //            case 1:
-        //
-        //                cell.nameItem.text = income[indexPath.row].name
-        //
-        //                cell.dateItem.text = income[indexPath.row].date
-        //
-        //                cell.nameItem.textColor = MyColors.green.getColor()
-        //
-        //                cell.amountTransaction.textColor = MyColors.lightGreen.getColor()
-        //
-        //                cell.amountTransaction.text = "+ Rs. \(income[indexPath.row].amount )"
-        //
-        //                print(income[indexPath.row].name)
-        //
-        //            default:
-        //
-        //                break
-        //
-        //            }
-        //
-        //        }
-        //
-        //            cell.nameItem.text = expense[indexPath.row].name
-        //
-        //            cell.dateItem.text = expense[indexPath.row].date
-        //
-        //            cell.nameItem.textColor = MyColors.red.getColor()
-        //
-        //            cell.amountTransaction.textColor = MyColors.red.getColor()
-        //
-        //            cell.amountTransaction.text = "- Rs. \(expense[indexPath.row].amount )"
-        
         
         return cell
         
@@ -946,5 +861,7 @@ extension StatisticVC: AxisValueFormatter {
   func stringForValue(_ value: Double, axis: AxisBase?) -> String {
       
     return months[Int(value)]
+      
   }
+    
 }

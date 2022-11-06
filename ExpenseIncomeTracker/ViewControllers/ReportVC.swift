@@ -58,8 +58,8 @@ class ReportVC: UIViewController {
         label.numberOfLines = 1
         
         label.textColor = .black
-        
-        label.font = UIFont(name: "Inter-SemiBold", size: 18)
+                
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
         
         return label
         
@@ -79,8 +79,8 @@ class ReportVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Regular", size: 14)
-        
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+
         return label
         
     }()
@@ -139,8 +139,8 @@ class ReportVC: UIViewController {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Regular", size: 16)
-        
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+
         return label
         
     }()
@@ -218,8 +218,8 @@ class ReportVC: UIViewController {
         label.numberOfLines = 1
         
         label.textColor = .white
-        
-        label.font = UIFont(name: "Inter-SemiBold", size: 18)
+                
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
         
         return label
         
@@ -272,9 +272,7 @@ class ReportVC: UIViewController {
         super.viewDidLoad()
         
         view.backgroundColor = .white
-        
-        getExpenseData()
-        
+                
         setupLayout()
         
         setupUIAction()
@@ -285,6 +283,12 @@ class ReportVC: UIViewController {
     
     // MARK: - View Will Appear
     override func viewWillAppear(_ animated: Bool) {
+        
+        income.removeAll()
+        
+        expense.removeAll()
+        
+        getExpenseData()
                 
     }
     
@@ -378,11 +382,19 @@ class ReportVC: UIViewController {
                                             
                 }
                 
-                TOTAL_INCOME = incomeAmt
+                if segmentedControl.selectedSegmentIndex == 0 {
+                    
+                    totalNumber.text = "NPR \(expenseAmt).00"
+                    
+                } else {
+                    
+                    totalNumber.text = "NPR \(incomeAmt).00"
+                    
+                }
                 
-                totalNumber.text = "Rs. \(expenseAmt)"
-                
-                TOTAL_EXPENSE = expenseAmt
+//                TOTAL_INCOME = incomeAmt
+//
+//                TOTAL_EXPENSE = expenseAmt
                                 
                 self.reportTable.reloadData()
                 
@@ -654,34 +666,54 @@ extension ReportVC {
         switch segmentedControl.selectedSegmentIndex {
             
         case 0:
+            
             addTitle.text = "Expense Report"
+            
             historyLabel.text = "Expense History"
+            
             totalLabel.text = "Total Expense"
+            
             let formatter = NumberFormatter()
+            
             formatter.locale = Locale(identifier: "en_NP")
+            
             formatter.numberStyle = .currency
+            
             if let formattedTipAmount = formatter.string(from: TOTAL_EXPENSE as NSNumber) {
+                
                 totalNumber.text = "\(formattedTipAmount)"
+                
             }
+            
             reportTable.reloadData()
             
         case 1:
+            
             addTitle.text = "Income Report"
+            
             historyLabel.text = "Income History"
+            
             totalLabel.text = "Total Income"
+            
             let formatter = NumberFormatter()
+            
             formatter.locale = Locale(identifier: "en_NP")
+            
             formatter.numberStyle = .currency
+            
             if let formattedTipAmount = formatter.string(from: TOTAL_INCOME as NSNumber) {
+                
                 totalNumber.text = "\(formattedTipAmount)"
+                
             }
+            
             reportTable.reloadData()
             
         default:
+            
             break
+            
         }
-        
-       
         
     }
     
@@ -914,9 +946,7 @@ extension ReportVC: UITableViewDelegate, UITableViewDataSource {
             default:
                 break
             }
-            
-            getExpenseData()
-            
+
         }
         
     }

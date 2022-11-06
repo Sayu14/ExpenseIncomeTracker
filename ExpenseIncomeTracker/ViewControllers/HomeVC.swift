@@ -100,8 +100,8 @@ class HomeVC: UIViewController {
         label.isUserInteractionEnabled = true
 
         label.textColor = MyColors.gray.getColor()
-
-        label.font = UIFont(name: "Inter-Regular", size: 14)
+        
+        label.font = .systemFont(ofSize: 14, weight: .regular)
 
         return label
 
@@ -120,8 +120,8 @@ class HomeVC: UIViewController {
         label.numberOfLines = 1
 
         label.textColor = .black
-
-        label.font = UIFont(name: "Inter-SemiBold", size: 18)
+        
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
 
         return label
 
@@ -134,8 +134,6 @@ class HomeVC: UIViewController {
         let label = UILabel()
 
         label.translatesAutoresizingMaskIntoConstraints = false
-
-//        label.text = "$ 284.00"
         
         label.text = "Rs. \(TOTAL_EXPENSE.string)"
 
@@ -161,7 +159,7 @@ class HomeVC: UIViewController {
 
         label.textColor = MyColors.lightGray.getColor()
 
-        label.font = UIFont(name: "Inter-Meidum", size: 16)
+        label.font = .systemFont(ofSize: 16, weight: .medium)
 
         return label
 
@@ -196,8 +194,6 @@ class HomeVC: UIViewController {
         let label = UILabel()
 
         label.translatesAutoresizingMaskIntoConstraints = false
-
-//        label.text = "$ 1,840.00"
         
         label.text = "Rs. \(TOTAL_INCOME.string)"
 
@@ -221,7 +217,7 @@ class HomeVC: UIViewController {
 
         label.textColor = MyColors.lightGray.getColor()
 
-        label.font = UIFont(name: "Inter-Meidum", size: 16)
+        label.font = .systemFont(ofSize: 16, weight: .medium)
 
         return label
 
@@ -310,8 +306,8 @@ class HomeVC: UIViewController {
         label.text = "Total Balance"
 
         label.textColor = .white
-
-        label.font = UIFont(name: "Inter-SemiBold", size: 16)
+        
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
 
         return label
 
@@ -349,11 +345,11 @@ class HomeVC: UIViewController {
 
         label.translatesAutoresizingMaskIntoConstraints = false
 
-        label.text = "Pablo"
+        label.text = ""
 
         label.textColor = .white
-
-        label.font = UIFont(name: "Inter-SemiBold", size: 20)
+        
+        label.font = .systemFont(ofSize: 20, weight: .semibold)
 
         return label
 
@@ -391,7 +387,7 @@ class HomeVC: UIViewController {
 
         label.textColor = .white
 
-        label.font = UIFont(name: "Inter-Regular", size: 14)
+        label.font = .systemFont(ofSize: 14, weight: .regular)
 
         return label
 
@@ -1100,6 +1096,14 @@ extension HomeVC: UITableViewDelegate, UITableViewDataSource {
             lblNoData.isHidden = true
 
             return 2
+            
+        } else if modelTransactionData?.count ?? 0 == 3 {
+            
+            imgNoData.isHidden = true
+            
+            lblNoData.isHidden = true
+
+            return 3
             
         } else if modelTransactionData?.count ?? 0 > 3 {
             

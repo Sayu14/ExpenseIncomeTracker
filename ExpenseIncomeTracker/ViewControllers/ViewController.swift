@@ -26,8 +26,8 @@ class ViewController: UIViewController {
         
         label.isUserInteractionEnabled = true
         
-        label.font = UIFont(name: "Inter-Regular", size: 14)
-        
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+
         return label
         
     }()
@@ -44,8 +44,8 @@ class ViewController: UIViewController {
         
         label.textColor = .black
         
-        label.font = UIFont(name: "Inter-Regular", size: 14)
-        
+        label.font = .systemFont(ofSize: 14, weight: .regular)
+
         return label
         
     }()
@@ -75,9 +75,7 @@ class ViewController: UIViewController {
         btn.setTitle("Get Started", for: .normal)
         
         btn.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
-        
-//        btn.titleLabel?.font = UIFont(name: "Inter-Regular", size: 18)
-        
+                
         return btn
         
     }()
@@ -175,6 +173,7 @@ class ViewController: UIViewController {
             present(nav, animated: true)
 
             }else{
+                
              //user is not logged in
                 
             }
@@ -365,7 +364,7 @@ extension ViewController {
     
     @objc func getStartedBtnAction() {
         
-        let vc = RegisterVC()
+        let vc = Register2VC()
         
         self.navigationController?.pushViewController(vc, animated: true)
         

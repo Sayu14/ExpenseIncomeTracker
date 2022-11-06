@@ -23,8 +23,8 @@ class CellStatisticTimePeriod: UICollectionViewCell {
         label.numberOfLines = 1
         
         label.textColor = MyColors.gray.getColor()
-        
-        label.font = UIFont(name: "Inter-Regular", size: 13)
+                
+        label.font = .systemFont(ofSize: 13, weight: .regular)
         
         return label
         

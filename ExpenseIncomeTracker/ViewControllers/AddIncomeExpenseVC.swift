@@ -68,12 +68,12 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         btn.translatesAutoresizingMaskIntoConstraints = false
         
         btn.setTitle("SAVE", for: .normal)
-        
-        btn.titleLabel?.font = UIFont(name: "Inter-SemiBold", size: 18)
+                
+        btn.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
         
         btn.backgroundColor = MyColors.green.getColor()
         
-        btn.layer.cornerRadius = 30
+        btn.layer.cornerRadius = 26
         
         btn.layer.shadowColor = MyColors.green.getColor().cgColor
         
@@ -123,7 +123,7 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
         date.textColor = MyColors.gray.getColor()
         
-        date.font = UIFont(name: "Inter-Medium", size: 14)
+        date.font = .systemFont(ofSize: 14, weight: .medium)
         
         date.inputAccessoryView = toolbar
         
@@ -165,8 +165,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 12)
-        
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+
         return label
         
     }()
@@ -180,8 +180,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         amount.translatesAutoresizingMaskIntoConstraints = false
         
         amount.textColor = MyColors.gray.getColor()
-        
-        amount.font = UIFont(name: "Inter-Medium", size: 14)
+                
+        amount.font = .systemFont(ofSize: 14, weight: .medium)
         
         amount.borderStyle = .none
         
@@ -225,8 +225,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         
         label.textColor = MyColors.gray.getColor()
         
-        label.font = UIFont(name: "Inter-Medium", size: 12)
-        
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+
         return label
         
     }()
@@ -240,8 +240,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         name.translatesAutoresizingMaskIntoConstraints = false
         
         name.textColor = MyColors.gray.getColor()
-        
-        name.font = UIFont(name: "Inter-Medium", size: 14)
+                
+        name.font = .systemFont(ofSize: 14, weight: .medium)
         
         name.borderStyle = .none
         
@@ -282,8 +282,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         label.numberOfLines = 1
         
         label.textColor = MyColors.gray.getColor()
-        
-        label.font = UIFont(name: "Inter-Medium", size: 12)
+                
+        label.font = .systemFont(ofSize: 12, weight: .medium)
         
         return label
         
@@ -365,8 +365,8 @@ class AddIncomeExpenseVC: UIViewController, UITextFieldDelegate {
         label.numberOfLines = 1
         
         label.textColor = .white
-        
-        label.font = UIFont(name: "Inter-SemiBold", size: 18)
+                
+        label.font = .systemFont(ofSize: 18, weight: .semibold)
         
         return label
         
@@ -730,7 +730,7 @@ extension AddIncomeExpenseVC {
             
             subView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -28),
             
-            subView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.55)
+            subView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.65)
             
         ])
         
@@ -792,7 +792,7 @@ extension AddIncomeExpenseVC {
         
         NSLayoutConstraint.activate([
             
-            amountLabel.topAnchor.constraint(equalTo: nameField.bottomAnchor, constant: 24),
+            amountLabel.topAnchor.constraint(equalTo: nameField.bottomAnchor, constant: 20),
             
             amountLabel.leadingAnchor.constraint(equalTo: nameLabel.leadingAnchor)
             
@@ -824,7 +824,7 @@ extension AddIncomeExpenseVC {
         
         NSLayoutConstraint.activate([
             
-            DateLabel.topAnchor.constraint(equalTo: amountField.bottomAnchor, constant: 24),
+            DateLabel.topAnchor.constraint(equalTo: amountField.bottomAnchor, constant: 20),
             
             DateLabel.leadingAnchor.constraint(equalTo: amountLabel.leadingAnchor)
             
@@ -860,9 +860,9 @@ extension AddIncomeExpenseVC {
             
             saveBtn.trailingAnchor.constraint(equalTo: subView.trailingAnchor, constant: -28),
             
-            saveBtn.topAnchor.constraint(equalTo: dateField.bottomAnchor, constant: 32),
+            saveBtn.topAnchor.constraint(equalTo: dateField.bottomAnchor, constant: 20),
             
-            saveBtn.heightAnchor.constraint(equalToConstant: 60)
+            saveBtn.heightAnchor.constraint(equalToConstant: 52)
             
         ])
         

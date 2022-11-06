@@ -96,7 +96,7 @@ class Login2VC: UIViewController {
 
         label.isUserInteractionEnabled = true
 
-        label.font = UIFont(name: "Inter-Regular", size: 14)
+        label.font = .systemFont(ofSize: 14, weight: .regular)
 
         return label
 
@@ -128,8 +128,6 @@ class Login2VC: UIViewController {
 
         btn.titleLabel?.font = .systemFont(ofSize: 18, weight: .semibold)
         
-//        btn.titleLabel?.font = UIFont(name: "Inter-Regular", size: 18)
-
         return btn
 
     }()
@@ -144,14 +142,19 @@ class Login2VC: UIViewController {
 
         password.textColor = .white
 
-        password.font = UIFont(name: "Inter-Medium", size: 14)
+        password.font = .systemFont(ofSize: 14, weight: .medium)
 
         password.borderStyle = .none
 
         password.isSecureTextEntry = true
 
         password.delegate = self
-
+        
+        password.attributedPlaceholder = NSAttributedString(
+            string: "Password",
+            attributes: [NSAttributedString.Key.foregroundColor: MyColors.lightGray.getColor().withAlphaComponent(0.8)]
+        )
+        
         password.keyboardType = .default
 
         password.addPadding(padding: .left(16))
@@ -180,12 +183,17 @@ class Login2VC: UIViewController {
 
         email.textColor = .white
 
-        email.font = UIFont(name: "Inter-Medium", size: 14)
+        email.font = .systemFont(ofSize: 14, weight: .medium)
 
         email.borderStyle = .none
 
         email.delegate = self
-
+        
+        email.attributedPlaceholder = NSAttributedString(
+            string: "Email",
+            attributes: [NSAttributedString.Key.foregroundColor: MyColors.lightGray.getColor().withAlphaComponent(0.8)]
+        )
+        
         email.keyboardType = .emailAddress
 
         email.autocapitalizationType = .none
@@ -254,7 +262,7 @@ class Login2VC: UIViewController {
 
         label.textColor = MyColors.lightGray.getColor()
 
-        label.font = UIFont(name: "Inter-Regular", size: 14)
+        label.font = .systemFont(ofSize: 14, weight: .regular)
 
         return label
 
@@ -274,7 +282,7 @@ class Login2VC: UIViewController {
 
         label.textColor = .white
 
-        label.font = UIFont(name: "Inter-Bold", size: 32)
+        label.font = UIFont(name: "Inter-Bold", size: 30)
 
         return label
 
@@ -864,7 +872,7 @@ extension Login2VC {
     
     @objc func lblRegisterAction() {
         
-        let vc = RegisterVC()
+        let vc = Register2VC()
         
         self.navigationController?.pushViewController(vc, animated: true)
         
@@ -967,6 +975,7 @@ extension Login2VC {
                     if authError.code == AuthErrorCode.secondFactorRequired.rawValue {
                         
                         // The user is a multi-factor user. Second factor challenge is required.
+                        
                         let resolver = authError
                             .userInfo[AuthErrorUserInfoMultiFactorResolverKey] as! MultiFactorResolver
                         
@@ -1159,13 +1168,15 @@ extension UITextField {
     
     func setImage(imageName: String, on side: TextFieldImageSide) {
         
-        let imageView = UIImageView(frame: CGRect(x: 4, y: 13 , width: 24, height: 16))
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 10 , width: 20, height: 16))
         
         if let imageWithSystemName = UIImage(systemName: imageName) {
             
             imageView.image = imageWithSystemName
             
             imageView.tintColor = MyColors.lightGray.getColor()
+            
+            imageView.contentMode = .scaleToFill
             
         } else {
             
