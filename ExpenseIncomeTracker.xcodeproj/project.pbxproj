@@ -51,6 +51,10 @@
 		7A2F544E2916C97E00E6516F /* Register2VC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A2F544D2916C97E00E6516F /* Register2VC.swift */; };
 		7A57EFEE29142BF00037021E /* ViewAllVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A57EFED29142BF00037021E /* ViewAllVC.swift */; };
 		7A57EFF02914C1F40037021E /* EditDetailsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A57EFEF2914C1F40037021E /* EditDetailsVC.swift */; };
+		7A5B368F291B948100AF2808 /* Videos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5B368D291B948100AF2808 /* Videos.swift */; };
+		7A5B3690291B948100AF2808 /* SubjectListResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5B368E291B948100AF2808 /* SubjectListResponse.swift */; };
+		7A5B3692291B954B00AF2808 /* JSONFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A5B3691291B954B00AF2808 /* JSONFile.swift */; };
+		7A92E2D9291A595700EE59ED /* CellReportItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A92E2D8291A595700EE59ED /* CellReportItem.swift */; };
 		7AD296302907293A005B224C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7AD2962F2907293A005B224C /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -97,6 +101,10 @@
 		7A2F544D2916C97E00E6516F /* Register2VC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Register2VC.swift; sourceTree = "<group>"; };
 		7A57EFED29142BF00037021E /* ViewAllVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewAllVC.swift; sourceTree = "<group>"; };
 		7A57EFEF2914C1F40037021E /* EditDetailsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditDetailsVC.swift; sourceTree = "<group>"; };
+		7A5B368D291B948100AF2808 /* Videos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Videos.swift; sourceTree = "<group>"; };
+		7A5B368E291B948100AF2808 /* SubjectListResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SubjectListResponse.swift; sourceTree = "<group>"; };
+		7A5B3691291B954B00AF2808 /* JSONFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONFile.swift; sourceTree = "<group>"; };
+		7A92E2D8291A595700EE59ED /* CellReportItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellReportItem.swift; sourceTree = "<group>"; };
 		7AD2962F2907293A005B224C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		7AF6200D2910E09D0030BCD5 /* ExpenseIncomeTracker.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ExpenseIncomeTracker.entitlements; sourceTree = "<group>"; };
 		8191715D8723D736F4E2606F /* Pods-ExpenseIncomeTracker.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ExpenseIncomeTracker.release.xcconfig"; path = "Target Support Files/Pods-ExpenseIncomeTracker/Pods-ExpenseIncomeTracker.release.xcconfig"; sourceTree = "<group>"; };
@@ -151,6 +159,7 @@
 			children = (
 				7AF6200D2910E09D0030BCD5 /* ExpenseIncomeTracker.entitlements */,
 				7A12C43D2909268A009EB7EA /* Models */,
+				7A92E2D7291A593700EE59ED /* CellTableView */,
 				7A029ADA290710B900A2D785 /* CellCollectionView */,
 				7A029AC92907106500A2D785 /* ViewControllers */,
 				7A029AA42907103700A2D785 /* CustomFonts */,
@@ -222,9 +231,20 @@
 		7A12C43D2909268A009EB7EA /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				7A5B368E291B948100AF2808 /* SubjectListResponse.swift */,
+				7A5B368D291B948100AF2808 /* Videos.swift */,
 				7A12C43E2909269B009EB7EA /* ModelTransactionDetails.swift */,
+				7A5B3691291B954B00AF2808 /* JSONFile.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		7A92E2D7291A593700EE59ED /* CellTableView */ = {
+			isa = PBXGroup;
+			children = (
+				7A92E2D8291A595700EE59ED /* CellReportItem.swift */,
+			);
+			path = CellTableView;
 			sourceTree = "<group>";
 		};
 		FE89125DE184393704E1C083 /* Frameworks */ = {
@@ -381,6 +401,7 @@
 				7A029AA129070F8D00A2D785 /* Utilities.swift in Sources */,
 				7A029AD22907108500A2D785 /* ReportVC.swift in Sources */,
 				7A029AD72907108500A2D785 /* AddIncomeExpenseVC.swift in Sources */,
+				7A5B3692291B954B00AF2808 /* JSONFile.swift in Sources */,
 				7A12C43C290910EE009EB7EA /* CellTransactionItem.swift in Sources */,
 				7A029AD52907108500A2D785 /* LoginVC.swift in Sources */,
 				7A029AD62907108500A2D785 /* ProfileVC.swift in Sources */,
@@ -392,10 +413,13 @@
 				7A57EFF02914C1F40037021E /* EditDetailsVC.swift in Sources */,
 				7A029AD42907108500A2D785 /* TransactionDetailsVC.swift in Sources */,
 				7A029AD92907108500A2D785 /* RegisterVC.swift in Sources */,
+				7A92E2D9291A595700EE59ED /* CellReportItem.swift in Sources */,
+				7A5B3690291B948100AF2808 /* SubjectListResponse.swift in Sources */,
 				7A029AD82907108500A2D785 /* HomeVC.swift in Sources */,
 				7A12C43F2909269B009EB7EA /* ModelTransactionDetails.swift in Sources */,
 				7A029A8D29070EE700A2D785 /* AppDelegate.swift in Sources */,
 				7A029ADC290710CD00A2D785 /* CellStatisticTimePeriod.swift in Sources */,
+				7A5B368F291B948100AF2808 /* Videos.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

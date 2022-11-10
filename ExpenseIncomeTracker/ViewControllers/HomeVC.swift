@@ -1031,6 +1031,8 @@ extension HomeVC {
         seeAllGesture.numberOfTouchesRequired = 1
         
         seeAll.addGestureRecognizer(seeAllGesture)
+        
+        notificationBtn.addTarget(self, action: #selector(notificationBtnAction), for: .touchUpInside)
 
     }
 
@@ -1047,6 +1049,14 @@ extension HomeVC {
     @objc func seeAllTapped() {
         
         let vc = ViewAllVC()
+        
+        self.navigationController?.pushViewController(vc, animated: true)
+        
+    }
+    
+    @objc func notificationBtnAction() {
+        
+        let vc = LoginVC()
         
         self.navigationController?.pushViewController(vc, animated: true)
         

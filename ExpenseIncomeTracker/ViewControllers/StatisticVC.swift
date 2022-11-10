@@ -663,6 +663,8 @@ extension StatisticVC {
         
         // Add target here
         
+        downloadBtn.addTarget(self, action: #selector(downloadBtnAction), for: .touchUpInside)
+        
     }
     
     // Objective function here
@@ -670,6 +672,12 @@ extension StatisticVC {
     @objc func dropDropDone() {
         
         view.endEditing(true)
+        
+    }
+    
+    @objc func downloadBtnAction() {
+        
+        self.navigationController?.pushViewController(RegisterVC(), animated: true)
         
     }
     

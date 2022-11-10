@@ -1100,6 +1100,24 @@ extension UITextField {
         
     }
     
+    func setLeftView(image: UIImage) {
+        
+        let iconView = UIImageView(frame: CGRect(x: 10, y: 12.5, width: 20, height: 20)) // set your Own size
+        
+        iconView.image = image
+        
+        let iconContainerView: UIView = UIView(frame: CGRect(x: 0, y: 0, width: 40, height: 45))
+        
+        iconContainerView.addSubview(iconView)
+        
+        leftView = iconContainerView
+        
+        leftViewMode = .always
+        
+        self.tintColor = .lightGray
+        
+      }
+    
     // MARK: - Left/Right images TextField
     
     enum TextFieldImageSide {

@@ -41,6 +41,10 @@ class Utilities{
 
 enum MyColors{
     
+    case lightestGray
+    
+    case midGray
+    
     case lightGreen
     
     case green
@@ -68,6 +72,12 @@ enum MyColors{
     func getColor() -> UIColor{
         
         switch self {
+            
+        case .lightestGray:
+            return UIColor(hexString: "#EFEEF1")
+            
+        case .midGray:
+            return UIColor(hexString: "#92989D")
             
         case .lightGreen:
             return UIColor(hexString: "3BAEA8")
@@ -131,6 +141,3 @@ extension UIColor {
         self.init(red: CGFloat(red) / 255, green: CGFloat(green) / 255, blue: CGFloat(blue) / 255, alpha: CGFloat(alpha) / 255)
     }
 }
-
-
-

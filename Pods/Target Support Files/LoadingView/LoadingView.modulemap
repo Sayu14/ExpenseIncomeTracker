@@ -1,0 +1,6 @@
+framework module LoadingView {
+  umbrella header "LoadingView-umbrella.h"
+
+  export *
+  module * { export * }
+}
